@@ -1,204 +1,225 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SUNO｜Vtuber配信用BGMプロンプト生成</title>
-
-<style>
-:root{
-  --bg:#050508;
-  --panel:#0e0e14;
-  --accent:#ff4d00;
-  --text:#f2f2f6;
-  --muted:#9fa0b5;
-}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;
-}
-.wrap{max-width:1100px;margin:auto;padding:20px}
-.card{
-  background:var(--panel);
-  border:1px solid #222;
-  border-radius:18px;
-  padding:16px;
-  margin-bottom:18px;
-}
-h1{font-size:16px;margin:0 0 6px}
-h2{font-size:14px;margin:14px 0 6px}
-.note{font-size:12px;color:var(--muted);margin-bottom:10px}
-
-.btnrow{display:flex;flex-wrap:wrap;gap:8px}
-.btn{
-  padding:8px 12px;
-  border-radius:12px;
-  border:1px solid #333;
-  background:#111;
-  color:#fff;
-  font-size:12px;
-  cursor:pointer;
-}
-.btn.active{
-  border-color:var(--accent);
-  box-shadow:0 0 0 2px rgba(255,77,0,.3);
-}
-
-textarea{
-  width:100%;
-  min-height:90px;
-  background:#0b0b10;
-  border:1px solid #333;
-  border-radius:12px;
-  color:#fff;
-  padding:10px;
-  font-size:12px;
-}
-
-.actions{
-  display:flex;
-  justify-content:flex-end;
-  gap:10px;
-  margin-top:12px;
-}
-.primary{
-  background:linear-gradient(#ff5a1f,#ff3d00);
-  border:none;
-  padding:10px 16px;
-  border-radius:14px;
-  font-weight:700;
-  cursor:pointer;
-}
-.copy{
-  background:#111;
-  border:1px solid #444;
-  border-radius:999px;
-  padding:5px 10px;
-  font-size:11px;
-  cursor:pointer;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ここも式：仮説カード（決めつけない）</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; margin: 18px; line-height: 1.5; }
+    h1 { font-size: 20px; margin: 0 0 10px; }
+    .note { background:#f6f6f6; padding:10px; border-radius:10px; }
+    .q { border:1px solid #e5e5e5; border-radius:12px; padding:12px; margin:12px 0; }
+    .q-title { font-weight: 700; margin-bottom: 8px; }
+    .opts { display: grid; gap: 6px; }
+    label { display:block; padding:8px 10px; border:1px solid #ddd; border-radius:10px; cursor:pointer; }
+    input { margin-right: 8px; }
+    button { padding:10px 14px; border:0; border-radius:12px; cursor:pointer; font-weight:700; }
+    .primary { background:#111; color:#fff; }
+    .secondary { background:#eee; }
+    .cards { display:grid; gap:12px; margin-top: 14px; }
+    .card { border:1px solid #e5e5e5; border-radius:14px; padding:12px; }
+    .tag { display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; background:#f1f1f1; margin-right:6px; }
+    .bar { height:10px; background:#eee; border-radius:999px; overflow:hidden; }
+    .bar > div { height:10px; background:#111; width:0%; }
+    .small { font-size: 12px; color:#444; }
+  </style>
 </head>
-
 <body>
-<div class="wrap">
+  <h1>ここも式：仮説カード（決めつけない）</h1>
 
-<div class="card">
-  <h1>SUNO｜Vtuber配信用BGMプロンプト生成</h1>
-  <div class="note">
-    配信タイプ・空気感・<strong>声やキャラの雰囲気（任意）</strong>を選ぶだけで、  
-    声を邪魔しないインストBGM用プロンプトを生成します。
-  </div>
-</div>
-
-<div class="card">
-  <h2>🎯 配信タイプ（ひとつ選択）</h2>
-  <div class="btnrow" data-group="type" data-single="true">
-    <button class="btn" data-value="chat">雑談メイン</button>
-    <button class="btn" data-value="game">ゲーム集中</button>
-    <button class="btn" data-value="chill">癒し・チル</button>
-    <button class="btn" data-value="work">作業・勉強</button>
-    <button class="btn" data-value="event">イベント／特別枠</button>
+  <div class="note small">
+    <b>これは診断ではなく「仮説づくり」です。</b><br>
+    子どもを固定するためではなく、「どんな調整が効きそうか」を探すための道具。<br>
+    医療・発達の確定判断には使いません（必要なら専門機関へ）。
   </div>
 
-  <h2>🎭 配信の空気感（複数選択OK）</h2>
-  <div class="btnrow" data-group="mood">
-    <button class="btn" data-value="loose">ゆるい</button>
-    <button class="btn" data-value="calm">落ち着いた</button>
-    <button class="btn" data-value="focus">集中したい</button>
-    <button class="btn" data-value="hype">盛り上げたい</button>
-    <button class="btn" data-value="night">深夜向け</button>
-    <button class="btn" data-value="morning">朝向け</button>
+  <div id="quiz"></div>
+
+  <div style="display:flex; gap:10px; margin-top:14px;">
+    <button class="primary" id="btnResult">結果を見る</button>
+    <button class="secondary" id="btnReset">リセット</button>
   </div>
 
-  <h2>🎤 声・キャラの雰囲気（任意）</h2>
-  <div class="btnrow" data-group="character">
-    <button class="btn" data-value="cute">かわいい／妹っぽい</button>
-    <button class="btn" data-value="calm_senior">落ち着いた／お姉さん・お兄さん</button>
-    <button class="btn" data-value="prince">元気／少年・王子様</button>
-    <button class="btn" data-value="bro">頼れる／兄貴</button>
-    <button class="btn" data-value="neutral">中性的／ミステリアス</button>
-    <button class="btn" data-value="ossan">渋い／おっさん</button>
-    <button class="btn" data-value="dandy">ダンディ／低音ボイス</button>
-  </div>
-
-  <div class="actions">
-    <button class="primary" onclick="generate()">生成する</button>
-  </div>
-</div>
-
-<div class="card">
-  <h2>🎼 Style <button class="copy" onclick="copy('styleOut')">コピー</button></h2>
-  <textarea id="styleOut"></textarea>
-
-  <h2>📝 Prompt <button class="copy" onclick="copy('promptOut')">コピー</button></h2>
-  <textarea id="promptOut"></textarea>
-
-  <h2>🛒 曲の説明 <button class="copy" onclick="copy('descOut')">コピー</button></h2>
-  <textarea id="descOut"></textarea>
-</div>
-
-</div>
+  <div id="result" style="margin-top:16px;"></div>
 
 <script>
-const state = { type:null, mood:[], character:[] };
+/**
+ * 0〜3: 0=まったくない / 1=ときどき / 2=よくある / 3=かなり強い
+ * module: sensory / ef / temperament
+ */
+const QUESTIONS = [
+  // 感覚
+  { id:"s1", module:"sensory", text:"人の声や生活音が気になって、集中が切れることがある" },
+  { id:"s2", module:"sensory", text:"光（まぶしさ）や匂いで疲れやすい／頭が痛くなることがある" },
+  { id:"s3", module:"sensory", text:"服のタグ・肌ざわり・髪が顔に当たるなどがストレスになりやすい" },
+  // 実行機能
+  { id:"e1", module:"ef", text:"始めるまでに時間がかかり、着手できないことがある（やる気はあるのに）" },
+  { id:"e2", module:"ef", text:"予定変更や切り替えが苦手で、気持ちが乱れやすい" },
+  { id:"e3", module:"ef", text:"指示が複数あると抜けやすい／途中で何をしてたか忘れやすい" },
+  // 気質
+  { id:"t1", module:"temperament", text:"初めての場所・人・活動は、慣れるまで緊張が強い" },
+  { id:"t2", module:"temperament", text:"刺激が多いと、疲れがどっと出る／一人時間が必要になる" },
+  { id:"t3", module:"temperament", text:"好きなことは深く没頭する一方、興味がないと動きにくい" },
+];
 
-document.querySelectorAll(".btnrow").forEach(row=>{
-  row.addEventListener("click",e=>{
-    const btn=e.target.closest(".btn");
-    if(!btn)return;
-    const g=row.dataset.group;
-    const single=row.dataset.single;
-
-    if(single){
-      row.querySelectorAll(".btn").forEach(b=>b.classList.remove("active"));
-      btn.classList.add("active");
-      state[g]=btn.dataset.value;
-    }else{
-      btn.classList.toggle("active");
-      state[g]=[...row.querySelectorAll(".active")].map(b=>b.dataset.value);
-    }
-  });
-});
-
-const characterSound = {
-  cute:"light synths, higher tones, soft rhythm",
-  calm_senior:"warm midrange, stable pads",
-  prince:"bright chords, clean plucks",
-  bro:"solid low end, clear rhythm",
-  neutral:"ambient textures, minimal melody",
-  ossan:"lofi texture, warm mids",
-  dandy:"jazzy harmony, deep bass"
+// 表示用ラベル
+const LABELS = {
+  sensory: { name:"感覚（音・光・匂い・触覚）", hint:"環境からの刺激量" },
+  ef: { name:"実行機能（着手・切替・見通し）", hint:"頭の段取り力" },
+  temperament: { name:"気質（慎重さ・刺激反応・没頭）", hint:"生まれつきの反応傾向" },
 };
 
-function generate(){
-  const charDesc = state.character.map(c=>characterSound[c]).join("; ");
+// 回答選択肢
+const OPTIONS = [
+  { v:0, label:"0：まったくない／ほぼ困らない" },
+  { v:1, label:"1：ときどきある" },
+  { v:2, label:"2：よくある" },
+  { v:3, label:"3：かなり強い／頻繁に困る" },
+];
 
-  styleOut.value =
-`instrumental VTuber livestream BGM, voice-friendly, loopable`;
+function renderQuiz(){
+  const root = document.getElementById("quiz");
+  root.innerHTML = "";
 
-  promptOut.value =
-`Create instrumental background music for VTuber livestreams.
-No vocals, no lyrics, no voice samples.
-Optimized to never mask speaking voice.
-Style: ${state.type || "chat"}.
-Mood: ${state.mood.join(", ") || "balanced"}.
-Character tone: ${charDesc || "neutral, versatile"}.
-Avoid aggressive leads, harsh highs, vocal-range instruments.`;
-
-  descOut.value =
-`Vtuber配信用に設計されたインストゥルメンタルBGMです。
-配信タイプ「${state.type || "雑談"}」に合わせ、
-声やキャラクターの雰囲気（${state.character.join("／") || "指定なし"}）を邪魔しない音作りを意識しています。
-長時間の配信でも疲れにくく、自然にループするため安心して使用できます。`;
+  QUESTIONS.forEach((q, idx)=>{
+    const div = document.createElement("div");
+    div.className = "q";
+    div.innerHTML = `
+      <div class="q-title">Q${idx+1}. ${escapeHtml(q.text)}</div>
+      <div class="opts">
+        ${OPTIONS.map(o=>`
+          <label>
+            <input type="radio" name="${q.id}" value="${o.v}">
+            ${escapeHtml(o.label)}
+          </label>
+        `).join("")}
+      </div>
+    `;
+    root.appendChild(div);
+  });
 }
 
-function copy(id){
-  navigator.clipboard.writeText(document.getElementById(id).value);
+function getScores(){
+  const scores = { sensory:0, ef:0, temperament:0 };
+  const max = { sensory:0, ef:0, temperament:0 };
+
+  for(const q of QUESTIONS){
+    max[q.module] += 3;
+    const checked = document.querySelector(`input[name="${q.id}"]:checked`);
+    const v = checked ? Number(checked.value) : 0; // 未回答は0扱い（安全寄り）
+    scores[q.module] += v;
+  }
+  return { scores, max };
 }
+
+function level(pct){
+  // pct 0-100
+  if(pct >= 70) return { key:"high", label:"高め", strength:3 };
+  if(pct >= 40) return { key:"mid", label:"中くらい", strength:2 };
+  return { key:"low", label:"低め", strength:1 };
+}
+
+function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+
+function buildInterventionGuidance(pSens, pEf, pTemp){
+  // 環境調整強度：感覚が高いほど、まず環境で下げやすい
+  // 本人伴走強度：実行機能・気質が高いほど、長期支援が効く
+  const env = clamp(Math.round((pSens*0.65 + pEf*0.20 + pTemp*0.15)/10), 1, 10);
+  const coach = clamp(Math.round((pEf*0.55 + pTemp*0.35 + pSens*0.10)/10), 1, 10);
+
+  // 方針文（ざっくり）
+  let policy = "小さく試して、効いた調整を残す（実験モード）";
+  if(env >= 7 && coach <= 5) policy = "まず環境調整を厚く（即効性）→落ち着いたら本人調整へ";
+  if(env <= 5 && coach >= 7) policy = "対話と伴走で『自分で調整する力』を育てる比重を上げる";
+  if(env >= 7 && coach >= 7) policy = "環境も伴走も両方必要（短期の安全＋長期の自立）";
+
+  return { env, coach, policy };
+}
+
+function cardFor(moduleKey, pct, lvl){
+  const base = LABELS[moduleKey];
+  const suggestions = {
+    sensory: [
+      "刺激を減らす：音（イヤーマフ/席/時間帯）、光（間接照明/帽子）、匂い（換気/場所）",
+      "“回復できる逃げ場”を用意：静かな部屋、車、パーテーション、短時間の離脱OK",
+      "本人に渡す言葉：『気になるのは弱さじゃなくて、センサーが良いってこと』"
+    ],
+    ef: [
+      "着手の支援：最初の1分を一緒に／手順を1つにする／タイマーで区切る",
+      "見通し：ToDoを3つまで・チェック式・終点を見える化",
+      "切替：予定変更は“予告”＋“選択肢を2つ”で渡す"
+    ],
+    temperament: [
+      "新規は“段階”で：見学→短時間参加→役割あり参加",
+      "刺激後は回復時間を確保（翌日しんどい子もいる）",
+      "没頭は資源：好きから自己効力感を回復し、他領域へ橋をかける"
+    ]
+  };
+
+  return `
+    <div class="card">
+      <div><span class="tag">${escapeHtml(base.name)}</span><span class="small">(${escapeHtml(base.hint)})</span></div>
+      <div style="margin:8px 0;"><b>傾向：${lvl.label}</b>（${pct}%）</div>
+      <div class="bar"><div style="width:${pct}%;"></div></div>
+      <ul>
+        ${suggestions[moduleKey].map(s=>`<li>${escapeHtml(s)}</li>`).join("")}
+      </ul>
+      <div class="small">※これは「当てにいく結果」ではなく、支援の仮説です。</div>
+    </div>
+  `;
+}
+
+function showResult(){
+  const { scores, max } = getScores();
+  const pSens = Math.round(scores.sensory / max.sensory * 100);
+  const pEf = Math.round(scores.ef / max.ef * 100);
+  const pTemp = Math.round(scores.temperament / max.temperament * 100);
+
+  const lSens = level(pSens), lEf = level(pEf), lTemp = level(pTemp);
+  const guide = buildInterventionGuidance(pSens, pEf, pTemp);
+
+  const result = document.getElementById("result");
+  result.innerHTML = `
+    <div class="note">
+      <b>介入の目安（強度）</b><br>
+      環境調整：<b>${guide.env}/10</b>　｜　本人伴走：<b>${guide.coach}/10</b><br>
+      方針：<b>${escapeHtml(guide.policy)}</b>
+    </div>
+
+    <div class="cards">
+      ${cardFor("sensory", pSens, lSens)}
+      ${cardFor("ef", pEf, lEf)}
+      ${cardFor("temperament", pTemp, lTemp)}
+    </div>
+
+    <div class="note small" style="margin-top:12px;">
+      <b>次にやると精度が上がること</b><br>
+      1) 「いつ・どこで・何が起きると困るか」を具体例で1つ書く（事例が最強）<br>
+      2) 調整は1つずつ試す（同時に変えると原因が分からない）<br>
+      3) “できた/できない”ではなく、“楽になった/疲れが減った”で評価する
+    </div>
+  `;
+  result.scrollIntoView({ behavior:"smooth" });
+}
+
+function resetAll(){
+  QUESTIONS.forEach(q=>{
+    const checked = document.querySelector(`input[name="${q.id}"]:checked`);
+    if(checked) checked.checked = false;
+  });
+  document.getElementById("result").innerHTML = "";
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, s => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[s]));
+}
+
+document.getElementById("btnResult").addEventListener("click", showResult);
+document.getElementById("btnReset").addEventListener("click", resetAll);
+
+renderQuiz();
 </script>
-
 </body>
 </html>
