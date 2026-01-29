@@ -3,20 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>子どもサポート・ナビ Plus+</title>
+    <title>子どもサポート・ナビ</title>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --mi-color: #ff7f7f; --ki-color: #ffb347; --ka-color: #76ba1b; --to-color: #4db8ff;
-            --bg-color: #fdfbf7; --text: #444;
+            --bg-color: #fffaf0; --text: #444;
         }
-        body { font-family: 'Zen Maru Gothic', sans-serif; background-color: var(--bg-color); color: var(--text); padding: 10px; display: flex; justify-content: center; }
-        .container { max-width: 800px; width: 100%; background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 3px dashed #e0e0e0; position: relative; }
+        body { font-family: 'Zen Maru Gothic', sans-serif; background-color: var(--bg-color); color: var(--text); margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .container { max-width: 600px; width: 100%; background: white; padding: 20px; border-radius: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); border: 2px solid #eee; position: relative; }
         
-        .tab-menu { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
-        .tab-btn { flex: 1; padding: 12px 5px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; background: #eee; transition: 0.3s; font-family: inherit; font-size: 0.9rem; }
+        /* タイトルと注意書き */
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { font-size: 1.6rem; color: #d48344; margin: 10px 0; }
+        .intro-box { background: #fff5e6; border-radius: 15px; padding: 15px; font-size: 0.85rem; line-height: 1.6; border: 1px solid #f9e2c4; text-align: left; margin-bottom: 20px; }
+        .intro-box strong { color: #d48344; }
+
+        /* タブ */
+        .tab-menu { display: flex; gap: 4px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px 2px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; background: #f0f0f0; transition: 0.3s; font-family: inherit; font-size: 0.75rem; color: #888; }
         .tab-btn.active { color: white; }
         .tab-btn[data-tab="mi"].active { background: var(--mi-color); }
         .tab-btn[data-tab="kishitsu"].active { background: var(--ki-color); }
@@ -28,72 +35,81 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .question-scroll { max-height: 450px; overflow-y: auto; padding-right: 10px; border-bottom: 1px solid #eee; margin-bottom: 20px;}
-        .q-block { margin-bottom: 20px; background: #fffdf9; padding: 15px; border-radius: 15px; border: 1px solid #f0f0f0; }
-        .q-text { font-weight: bold; font-size: 0.95rem; margin-bottom: 10px; display: block; }
+        /* 質問スタイル (スマホ向けにボタン化) */
+        .q-block { margin-bottom: 20px; padding: 15px; border-radius: 15px; border: 1px solid #eee; background: #fff; }
+        .q-text { font-weight: bold; font-size: 0.95rem; margin-bottom: 12px; display: block; color: #333; }
         
-        /* 5段階回答のスタイル */
-        .radio-group { display: flex; justify-content: space-between; gap: 5px; flex-wrap: wrap; }
-        .radio-label { flex: 1; text-align: center; font-size: 0.75rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 60px; }
-        .radio-label input { margin-bottom: 5px; width: 18px; height: 18px; }
+        .radio-group { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+        .radio-label { text-align: center; font-size: 0.65rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .radio-label input { margin-bottom: 8px; width: 22px; height: 22px; cursor: pointer; }
 
-        .btn { width: 100%; padding: 15px; color: white; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
-        .btn-save { background: #888; margin-top: 10px; }
+        .btn { width: 100%; padding: 16px; color: white; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+        .btn-save { background: #999; margin-top: 10px; font-size: 0.9rem; }
         
-        .res-area { margin-top: 20px; padding: 20px; border-radius: 20px; display: none; line-height: 1.8; }
-        .total-card { padding: 25px; border-radius: 20px; background: white; border: 2px solid var(--to-color); }
-        .summary-box { background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 8px solid #ccc; }
+        /* 結果表示 */
+        .res-area { margin-top: 20px; padding: 20px; border-radius: 20px; display: none; border-left: 8px solid; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .total-card { padding: 15px; border-radius: 20px; background: white; }
+        .summary-box { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #eee; border-left: 8px solid #ccc; font-size: 0.9rem; }
         
-        #chart-container { max-width: 400px; margin: 20px auto; }
-        @media print { .tab-menu, .btn, .question-scroll { display: none !important; } .container { border: none; box-shadow: none; } .tab-content.active { display: block !important; } }
+        #chart-container { width: 100%; max-width: 350px; margin: 15px auto; }
+        
+        @media print { .tab-menu, .btn, .intro-box, .q-block { display: none !important; } .container { border: none; box-shadow: none; } }
     </style>
 </head>
 <body>
 
 <div class="container" id="app-container">
-    <h1>🌱 子どもサポート・ナビ</h1>
+    <div class="header">
+        <h1>🌱 子どもサポート・ナビ</h1>
+    </div>
+
+    <div class="intro-box">
+        🕊️ <strong>このツールの目的</strong><br>
+        この診断は、お子さんを特定の「型」にはめたり、可能性を決めつけるためのものではありません。<br><br>
+        「なぜ、あんな行動をするんだろう？」という疑問を<strong>「理解のヒント」</strong>に変え、親子がもっと楽に、自分らしく笑い合えるコミュニケーションを探るためのガイドです。お子さんの成長を温かく支えるための、一つの視点としてご活用ください。
+    </div>
     
     <div class="tab-menu">
-        <button class="tab-btn active" data-tab="mi">1. きらり（強み）</button>
-        <button class="tab-btn" data-tab="kishitsu">2. こころ（気質）</button>
-        <button class="tab-btn" data-tab="kankyo">3. くらし（環境）</button>
+        <button class="tab-btn active" data-tab="mi">✨きらり<br>(強み)</button>
+        <button class="tab-btn" data-tab="kishitsu">🌈こころ<br>(性格)</button>
+        <button class="tab-btn" data-tab="kankyo">🏠くらし<br>(環境)</button>
         <button class="tab-btn" data-tab="total" id="total-btn" disabled>📊 総合診断</button>
     </div>
 
     <div id="mi" class="tab-content active">
-        <p>お子さんの「得意・好き」を教えてください。</p>
-        <div class="question-scroll" id="mi-q"></div>
-        <button class="btn" style="background:var(--mi-color)" onclick="calcMI()">強みを分析する</button>
+        <p style="text-align:center; font-size:0.9rem;">🎨 お子さんの「これ、好きかも！」を選んでね</p>
+        <div id="mi-q"></div>
+        <button class="btn" style="background:var(--mi-color)" onclick="calcMI()">強みのヒントを見る 🔍</button>
         <div id="chart-container"><canvas id="miChart"></canvas></div>
-        <div id="mi-res" class="res-area" style="background:#fff0f0"></div>
+        <div id="mi-res" class="res-area" style="background:#fffafa; border-color:var(--mi-color)"></div>
     </div>
 
     <div id="kishitsu" class="tab-content">
-        <p>「生まれ持った性格」の傾向を教えてください。</p>
-        <div class="question-scroll" id="ki-q"></div>
-        <button class="btn" style="background:var(--ki-color)" onclick="calcKi()">気質を分析する</button>
-        <div id="ki-res" class="res-area" style="background:#fff7e6"></div>
+        <p style="text-align:center; font-size:0.9rem;">🍃 生まれ持った「心のクセ」を教えてね</p>
+        <div id="ki-q"></div>
+        <button class="btn" style="background:var(--ki-color)" onclick="calcKi()">気質のヒントを見る 🔍</button>
+        <div id="ki-res" class="res-area" style="background:#fffdf5; border-color:var(--ki-color)"></div>
     </div>
 
     <div id="kankyo" class="tab-content">
-        <p>日常の「過ごしやすさ」について教えてください。</p>
-        <div class="question-scroll" id="ka-q"></div>
-        <button class="btn" style="background:var(--ka-color)" onclick="calcKa()">環境を分析する</button>
-        <div id="ka-res" class="res-area" style="background:#f0f9eb"></div>
+        <p style="text-align:center; font-size:0.9rem;">🛋️ 日常の「ちょっと困った」の背景を探ろう</p>
+        <div id="ka-q"></div>
+        <button class="btn" style="background:var(--ka-color)" onclick="calcKa()">環境のヒントを見る 🔍</button>
+        <div id="ka-res" class="res-area" style="background:#fafffa; border-color:var(--ka-color)"></div>
     </div>
 
     <div id="total" class="tab-content">
         <div class="total-card" id="capture-area">
-            <h2 style="text-align:center; color:var(--to-color)">📊 お子さんへの伴走指針</h2>
+            <h2 style="text-align:center; color:var(--to-color); font-size:1.3rem;">🤝 お子さんへの伴走ガイド</h2>
             <div id="total-content"></div>
         </div>
         <button class="btn" style="background:var(--to-color)" onclick="window.print()">🖨️ 結果を印刷する</button>
-        <button class="btn btn-save" onclick="saveImage()">📸 画像として保存</button>
+        <button class="btn btn-save" onclick="saveImage()">📸 スマホに画像で保存</button>
     </div>
 </div>
 
 <script>
-// --- ヘルパー関数: 5段階回答の生成 ---
+// --- 5段階UI生成 ---
 function create5Scale(name) {
     return `
     <div class="radio-group">
@@ -105,34 +121,34 @@ function create5Scale(name) {
     </div>`;
 }
 
-// --- 質問データ構築 (各15問) ---
+// --- 質問データ (絵文字入り) ---
 const miData = [
-    { c: "言語", q: "知っている言葉が多く、大人顔負けの表現をすることがある" }, { c: "言語", q: "物語の読み聞かせや、自分で話を作ることを楽しむ" },
-    { c: "論理", q: "物事のルールや手順にこだわり、論理的に説明しようとする" }, { c: "論理", q: "数字のパズルや、ものの仕組みを分解して知ることが好き" },
-    { c: "空間", q: "頭の中に地図があるように、一度行った場所の道を覚えている" }, { c: "空間", q: "レゴやパズルなど、立体的な造形を迷いなく完成させる" },
-    { c: "身体", q: "ダンスやスポーツなど、見本を一度見ただけで体の動きを再現できる" }, { c: "身体", q: "工作や料理など、手先を細かく使う作業に没頭する" },
-    { c: "音楽", q: "日常の物音をリズムに例えたり、鼻歌をよく歌っている" }, { c: "音楽", q: "テレビや街角で流れる曲のメロディを正確に覚えている" },
-    { c: "対人", q: "下の子や友達の面倒をよく見たり、集団の空気を読むのが早い" }, { c: "対人", q: "友達と協力して何かを作り上げたり、交渉したりするのが上手" },
-    { c: "内省", q: "自分の好きなこと・嫌いなことがはっきりしており、芯が強い" }, { c: "内省", q: "自分の感情を分析したり、一人の時間を深く楽しんでいる" },
-    { c: "博物", q: "恐竜、虫、植物など特定の分野の図鑑を暗記するほど読み込む" }
+    { c: "言語", q: "📚 難しい言葉を使ったり、おしゃべりを楽しんだりする" }, { c: "言語", q: "📖 絵本の読み聞かせや、物語を作るのが好き" },
+    { c: "論理", q: "🧩 パズルや、モノを並べて分類するのが得意" }, { c: "論理", q: "🔍 「なぜ？どうして？」と仕組みを知りたがる" },
+    { c: "空間", q: "🗺️ 地図を覚えたり、絵の奥行きを捉えるのが上手" }, { c: "空間", q: "🏰 ブロックやレゴで立体的なモノを作るのが好き" },
+    { c: "身体", q: "🏃‍♂️ ダンスやスポーツ、体の使い方が器用" }, { c: "身体", q: "✂️ 工作や料理など、手先を細かく動かすのが得意" },
+    { c: "音楽", q: "🎶 鼻歌を歌ったり、リズムに乗るのが自然と出る" }, { c: "音楽", q: "🎹 楽器や、生活の中の「音」に敏感に反応する" },
+    { c: "対人", q: "🤝 友達の気持ちを察したり、仲直りさせるのが上手" }, { c: "対人", q: "🏫 みんなと一緒に何かをする時間を楽しめる" },
+    { c: "内省", q: "🧘 自分の意志がはっきりしていて、流されない強さがある" }, { c: "内省", q: "💭 ひとりで静かに考えに没頭する時間を大切にする" },
+    { c: "博物", q: "🦖 恐竜、植物、石など特定の収集や観察が大好き" }
 ];
 
 const kiData = [
-    { t: "デリケート", q: "音、光、においなどの小さな変化に敏感に反応する" }, { t: "デリケート", q: "完璧主義なところがあり、一度失敗すると強く落ち込む" }, { t: "デリケート", q: "初めての場所や人が苦手で、慣れるまで時間がかかる" },
-    { t: "アクティブ", q: "興味のあるものを見つけると、考えるより先に体が動く" }, { t: "アクティブ", q: "声が大きく、全身を使ってエネルギーをぶつけるように遊ぶ" },
-    { t: "エンジェル", q: "基本的に穏やかで聞き分けが良く、ニコニコしている" }, { t: "エンジェル", q: "自分の主張を通すより、周りの様子を見て合わせがち" },
-    { t: "テキスト", q: "「いつも通り」の手順を好み、急な予定変更を嫌がる" }, { t: "テキスト", q: "曖昧な指示よりも、具体的な数字やルールがある方が動ける" },
-    { t: "ネガティブ", q: "感情の起伏が激しく、一度パニックになると時間がかかる" }, { t: "ネガティブ", q: "こだわりが強く、自分の納得がいかないと一歩も動かない" },
-    { t: "デリケート", q: "大人の顔色を敏感に察知し、深く考えすぎる傾向がある" }, { t: "アクティブ", q: "退屈な時間が苦手で、常に刺激を求めて動き回る" }, { t: "テキスト", q: "収集癖があり、自分の集めたものを整理・整頓したがる" }, { t: "エンジェル", q: "平和主義で、友達同士のトラブルを見ると悲しがる" }
+    { t: "デリケート", q: "👂 音や光、肌触りなどの刺激にとても敏感" }, { t: "デリケート", q: "😟 失敗を怖がったり、完璧にやりたい気持ちが強い" }, { t: "デリケート", q: "🌳 初めての場所では、安全を確認するまで動かない" },
+    { t: "アクティブ", q: "🚀 興味があると考えるより先に体が動いている" }, { t: "アクティブ", q: "🔥 声が大きく、全身からエネルギーが溢れている" },
+    { t: "エンジェル", q: "🌸 基本的に穏やかで、周りの期待に応えようとする" }, { t: "エンジェル", q: "🤝 自分の主張より、みんなの調和を優先させがち" },
+    { t: "テキスト", q: "⏰ 決まったルーチンを好み、急な変更は苦手" }, { t: "テキスト", q: "📉 「10分だけ」など具体的な数字やルールが安心する" },
+    { t: "ネガティブ", q: "⚡ 感情が爆発すると、落ち着くまでに時間がかかる" }, { t: "ネガティブ", q: "💎 自分のこだわりが強く、納得しないとテコでも動かない" },
+    { t: "デリケート", q: "👀 大人の表情や空気を読みすぎて疲れることがある" }, { t: "アクティブ", q: "🏃‍♂️ 退屈が苦手で、常に何かの刺激を求めている" }, { t: "テキスト", q: "📦 自分の大切なものを整理・整頓するのが好き" }, { t: "エンジェル", q: "🕊️ 争いごとが苦手で、みんな仲良くいてほしいと願う" }
 ];
 
 const kaData = [
-    { t: "視覚支援", q: "「あれ持ってきて」などの抽象的な指示だけでは動けない" }, { t: "視覚支援", q: "言葉で説明されるより、写真や図で見せられた方が理解が早い" }, { t: "視覚支援", q: "予定をカレンダーやメモで可視化すると安心する" },
-    { t: "聴覚配慮", q: "ショッピングモールや運動会などの騒がしい場所が苦手" }, { t: "聴覚配慮", q: "話し声がざわついていると、大切な指示を聞き逃してしまう" },
-    { t: "構造化", q: "どこに何があるか一目でわからないと、片付けや準備ができない" }, { t: "構造化", q: "やるべきことの「手順」が細分化されていないと手が止まる" },
-    { t: "感覚統合", q: "特定の服のタグ、靴下の縫い目、食べ物の食感をひどく嫌がる" }, { t: "感覚統合", q: "高いところから飛び降りる、回転するなど強い刺激を好む" },
-    { t: "実行機能", q: "集中すると周りの声が聞こえなくなり、切り替えが難しい" }, { t: "実行機能", q: "複数の指示（お風呂入って、着替えて）を同時にこなせない" }, { t: "実行機能", q: "時間の感覚を掴むのが苦手で、いつも最後は慌ててしまう" },
-    { t: "感覚統合", q: "狭い場所やブランコなど、特定の揺れや圧迫を好む" }, { t: "実行機能", q: "物の紛失や、忘れ物がどうしても多くなってしまう" }, { t: "構造化", q: "静かな個室（パーテーション内）などの方が集中できる" }
+    { t: "視覚支援", q: "📢 言葉だけの指示だと、すぐに忘れてしまう" }, { t: "視覚支援", q: "🖼️ 写真やイラストで見せてもらう方がスッと入る" }, { t: "視覚支援", q: "📅 スケジュールが目に見えるところにあると安心する" },
+    { t: "聴覚配慮", q: "👂 ガヤガヤした場所だと、声が聞き取れず混乱する" }, { t: "聴覚配慮", q: "🎧 イヤーマフや静かな場所があるとホッとできる" },
+    { t: "構造化", q: "🧺 物の片付け場所が決まっていないと迷子になる" }, { t: "構造化", q: "🪜 手順を一つずつ「1, 2, 3...」と分けてほしい" },
+    { t: "感覚統合", q: "👕 服のタグや特定の食べ物の感触をひどく嫌がる" }, { t: "感覚統合", q: "🌀 くるくる回るものや、高いところが大好き" },
+    { t: "実行機能", q: "⏸️ 夢中になると、次の行動への切り替えが難しい" }, { t: "実行機能", q: "📝 忘れ物や、物の紛失がどうしても多くなってしまう" }, { t: "実行機能", q: "⏳ 時間の流れが掴みにくく、いつも慌ててしまう" },
+    { t: "感覚統合", q: "🧸 ぎゅっと抱きしめられるなど、圧迫刺激で落ち着く" }, { t: "実行機能", q: "🎒 準備をする際、何をすべきか順番がわからなくなる" }, { t: "構造化", q: "🤫 集中したい時は、囲われた静かなブースが落ち着く" }
 ];
 
 function setup() {
@@ -147,7 +163,6 @@ setup();
 
 let results = { mi:null, ki:null, ka:null };
 
-// --- 診断ロジック ---
 function calcMI() {
     let scores = {};
     miData.forEach((d,i) => {
@@ -158,19 +173,18 @@ function calcMI() {
     showMiChart(scores);
     const top = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
     
-    // 詳細解説生成
-    const miDetails = {
-        "言語": "【場面】読書や会話の場面<br>【あるある】大人顔負けの語彙を使い、言葉の微細なニュアンスを楽しみます。<br>【傾向】言葉で理解し、言葉で自分を表現することに喜びを感じるタイプです。新しい知識も、物語や会話形式で伝えると驚くほど吸収します。",
-        "論理": "【場面】遊びや片付けの場面<br>【あるある】「なぜ？」の理屈が通らないと納得しませんが、納得すればルールを厳守します。<br>【傾向】物事を整理し、法則性を見出すことに長けています。具体的な数字や手順を示すことで、本人の主体性が高まります。",
-        "空間": "【場面】工作や移動の場面<br>【あるある】初めての道でもスイスイ覚えたり、複雑な図形をパッと捉えます。<br>【傾向】頭の中で立体的なイメージを操るのが得意です。言葉での説明よりも、図解や動画を見せることで理解が劇的に早まります。",
-        "身体": "【場面】運動やモノづくりの場面<br>【あるある】見本を見ただけで動きをコピーしたり、手先を器用に使って何かを作ります。<br>【傾向】「動くこと」そのものが学習の入り口です。座学よりも、実際に体験し、手を動かしながら学ぶアプローチが最適です。",
-        "音楽": "【場面】日常や遊びの場面<br>【あるある】生活音をリズムとして捉えたり、鼻歌で感情を表現することが多いです。<br>【傾向】聴覚的な情報の処理能力が高いです。歌やリズムに乗せて覚えたり、BGMを活用することで情緒の安定や集中に繋がります。",
-        "対人": "【場面】友達や家族との交流<br>【あるある】周囲の空気を敏感に読み、相手に合わせた振る舞いを自然に行います。<br>【傾向】他者との相互作用の中で学ぶタイプです。ペアワークや、誰かのために役に立つ役割を与えることで、意欲が爆発的に向上します。",
-        "内省": "【場面】一人の時間や決断の場面<br>【あるある】自分の世界を大切にし、周囲に流されない独自の意志を持っています。<br>【傾向】自分自身と対話し、納得してから動くタイプです。本人のペースを尊重し、自分で選択させる場面を増やすことで成長します。",
-        "博物": "【場面】自然や図鑑、収集<br>【あるある】恐竜や植物などの特定ジャンルを深く掘り下げ、微細な違いを見分けます。<br>【傾向】観察と分類が強みです。興味のある対象と、今学ぶべきことを結びつける（例：恐竜で算数を学ぶ）と非常に効果的です。"
+    const details = {
+        "言語": "👄 <strong>【あるある】</strong> 言葉の面白さに敏感！大人と対等に話したがることがあります。<br>💡 <strong>【ヒント】</strong> 「対話」を通して教えるのが効果的。物語や比喩を使うとスッと伝わります。",
+        "論理": "🔢 <strong>【あるある】</strong> 納得感重視！「なぜダメなの？」の理由を論理的に知りたがります。<br>💡 <strong>【ヒント】</strong> ルールを可視化し、根拠を説明すると納得して動けます。数字も大好き。",
+        "空間": "🎨 <strong>【あるある】</strong> 頭の中にカメラがある！言葉で聞くより、図や映像で見る方が得意です。<br>💡 <strong>【ヒント】</strong> 図解、動画、写真。目で見て分かる情報を増やすと、劇的に理解が進みます。",
+        "身体": "🤸 <strong>【あるある】</strong> 考えるより先に体が動く！実際にやってみることで理解を深めます。<br>💡 <strong>【ヒント】</strong> 体験型学習がベスト。体を動かしながらの方が、脳も活発に動きます。",
+        "音楽": "🎵 <strong>【あるある】</strong> リズムで生きている！鼻歌を歌いながらの方が作業が捗ることも。<br>💡 <strong>【ヒント】</strong> 歌にして覚える、BGMを活用する。聴覚的なアクセントがやる気を引き出します。",
+        "対人": "👫 <strong>【あるある】</strong> 空気を読む名人！誰かの役に立ちたいという気持ちが強いです。<br>💡 <strong>【ヒント】</strong> ペア学習や、誰かを助ける「役割」を与えると、大きな力を発揮します。",
+        "内省": "🧘 <strong>【あるある】</strong> 自分のペースを守る人！自分に厳しく、納得してから動きたいタイプ。<br>💡 <strong>【ヒント】</strong> 一人で考える時間を尊重して。自分で選ばせることで自立心が育ちます。",
+        "博物": "🌲 <strong>【あるある】</strong> 観察の天才！好きな分野の細かな違いを驚くほど見つけます。<br>💡 <strong>【ヒント】</strong> 興味のある対象（例：電車、虫）をあらゆる学びに結びつけて伴走しましょう。"
     };
 
-    document.getElementById('mi-res').innerHTML = `<h3>🌟 お子さんの「きらり」強み：${top}的知能</h3><p>${miDetails[top]}</p>`;
+    document.getElementById('mi-res').innerHTML = `<h3>🌟 お子さんの「きらり」：${top}的知能</h3><p>${details[top]}</p>`;
     document.getElementById('mi-res').style.display = 'block';
     checkReady();
 }
@@ -179,7 +193,7 @@ function showMiChart(scores) {
     const ctx = document.getElementById('miChart').getContext('2d');
     const labels = ["言語","論理","空間","身体","音楽","対人","内省","博物"];
     if(window.miRadar) window.miRadar.destroy();
-    window.miRadar = new Chart(ctx, { type:'radar', data:{ labels, datasets:[{ label:'強みバランス', data: labels.map(l=>scores[l]||0), backgroundColor:'rgba(255,127,127,0.3)', borderColor: '#ff7f7f', borderWidth:3 }]}, options:{ scales:{ r:{ min:0, max:8, ticks:{ display:false }}} }});
+    window.miRadar = new Chart(ctx, { type:'radar', data:{ labels, datasets:[{ label:'強みのバランス', data: labels.map(l=>scores[l]||0), backgroundColor:'rgba(255,127,127,0.2)', borderColor: '#ff7f7f', borderWidth:2 }]}, options:{ scales:{ r:{ min:0, max:8, ticks:{ display:false }}} }});
 }
 
 function calcKi() {
@@ -189,17 +203,15 @@ function calcKi() {
         types[d.t] = (types[d.t] || 0) + val;
     });
     const main = Object.keys(types).reduce((a, b) => types[a] > types[b] ? a : b);
-    
-    const kiDetails = {
-        "デリケート": "【場面】初めての環境や注目される場面<br>【あるある】周囲をじっと観察し、安全を確認するまで石橋を叩き続けます。<br>【傾向】非常に豊かな感受性を持っています。無理に背中を押すよりも、「いつでも戻ってきていいよ」という安心感の中で、本人のタイミングを待つことが大切です。",
-        "アクティブ": "【場面】公園や広々とした空間<br>【あるある】ブレーキが効かないように突進し、全身で刺激を楽しみます。<br>【傾向】好奇心がエネルギーの源です。エネルギーを発散できる安全な環境を用意し、指示は短く端的に「止まる」「おいで」と伝えるのがコツです。",
-        "エンジェル": "【場面】集団生活や日常<br>【あるある】親の顔色を読み、期待に応えようとニコニコ頑張りすぎてしまいます。<br>【傾向】共感性が高い反面、自分の本音を閉じ込めがちです。一対一の落ち着いた時間で「本当はどうしたい？」と本音を引き出す伴走が必要です。",
-        "テキスト": "【場面】学習やルーチン作業<br>【あるある】「いつもと違う」にパニックになりますが、ルールがあれば誰よりもしっかり動けます。<br>【傾向】論理と見通しが安心の鍵です。変更は事前に伝え、具体的な数字や視覚的なルールを示すことで、才能が安定して発揮されます。",
-        "ネガティブ": "【場面】思い通りにいかない時<br>【あるある】激しい癇癪や拒否反応で、全身を使って自分の意志を表現します。<br>【傾向】情熱的で、強いこだわりと意志を持っています。感情を一度否定せずに受け止め（共感）、落ち着いてから代替案を交渉する姿勢が有効です。"
+    const details = {
+        "デリケート": "🌿 <strong>【あるある】</strong> 石橋を叩いて渡る慎重派。失敗を極端に嫌がることがあります。<br>💡 <strong>【ヒント】</strong> 無理に押さず、本人が安全だと確信するまで「待つ」のが一番の近道です。",
+        "アクティブ": "🚀 <strong>【あるある】</strong> 好奇心爆発！危ないことでも飛び込んで、後でびっくりします。<br>💡 <strong>【ヒント】</strong> 叱るより「予告」と「環境整備」。エネルギーを発散できる場所を多めに用意して。",
+        "エンジェル": "🌸 <strong>【あるある】</strong> 穏やかで育てやすい。でも、自分の本音をグッと堪えていることも。<br>💡 <strong>【ヒント】</strong> 「本当はどう思ってる？」と本音を拾い上げる時間を意識的に作ってあげて。",
+        "テキスト": "📚 <strong>【あるある】</strong> 規律正しく、見通しが必要。想定外のことにパニックになることも。<br>💡 <strong>【ヒント】</strong> 予定の変更は早めに。具体的で論理的な説明が本人の安心感に直結します。",
+        "ネガティブ": "⚡ <strong>【あるある】</strong> 情熱家で激しい！自分の思い通りにならないと全力で抵抗します。<br>💡 <strong>【ヒント】</strong> 感情を一度「まるごと」受け止めて。落ち着いてから交渉を始めましょう。"
     };
-
-    results.ki = { type: main, detail: kiDetails[main] };
-    document.getElementById('ki-res').innerHTML = `<h3>🍃 お子さんの「こころ」気質：${main}タイプ</h3><p>${kiDetails[main]}</p>`;
+    results.ki = { type: main, detail: details[main] };
+    document.getElementById('ki-res').innerHTML = `<h3>🌈 お子さんの「こころ」：${main}タイプ</h3><p>${details[main]}</p>`;
     document.getElementById('ki-res').style.display = 'block';
     checkReady();
 }
@@ -211,54 +223,50 @@ function calcKa() {
         scores[d.t] = (scores[d.t] || 0) + val;
     });
     const top = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
-    
-    const kaDetails = {
-        "視覚支援": "【場面】一日の流れや指示の場面<br>【あるある】「早くして」と言われても、何をすべきか分からずフリーズしてしまいます。<br>【傾向】耳からの情報を一時的に保持するのが苦手です。イラスト、写真、タイマーなどの視覚的な情報を置くことで、本人が自分で動けるようになります。",
-        "聴覚配慮": "【場面】運動会、給食、人混み<br>【あるある】特定の音やざわめきに過剰に反応し、集中力が切れたりパニックになります。<br>【傾向】音の取捨選択が難しく、全ての音が等しく入ってきます。イヤーマフの活用や、静かな避難場所を確保する環境調整が、本人の穏やかさに直結します。",
-        "構造化": "【場面】片付け、準備、学習<br>【あるある】どこから手をつけていいか分からず、周囲を散らかしたままになりがちです。<br>【傾向】情報の整理整頓が必要です。物の定位置をラベルで示したり、手順を1・2・3と小分けに提示することで、「できた！」という自信を育めます。",
-        "感覚統合": "【場面】更衣、食事、遊び<br>【あるある】服の感触を嫌がったり、逆に激しく回るなどの刺激を過剰に求めます。<br>【傾向】脳の感覚処理に独特な個性があります。不快な刺激を避け、本人が好む刺激（圧迫、揺れ等）を遊びの中で取り入れることで、脳が整理されます。",
-        "実行機能": "【場面】切り替え、記憶、計画<br>【あるある】指示を三つ出すと最後を忘れたり、遊びから勉強への切り替えにひどく苦労します。<br>【傾向】脳の「司令塔」部分が発達の途上です。大人が外付けの司令塔として、リマインド（声かけ）やチェックリストを伴走してあげることが必要です。"
+    const details = {
+        "視覚支援": "🖼️ <strong>【傾向】</strong> 耳からの指示より、目からの情報が安心材料になります。<br>💡 <strong>【対応】</strong> 写真、絵カード、タイマー。目で見て「今何をするか」が分かる環境を。",
+        "聴覚配慮": "🎧 <strong>【傾向】</strong> ざわつきが頭の中で混ざってしまい、疲れやすいです。<br>💡 <strong>【対応】</strong> 静かな「避難場所」の確保。指示を出す時は一対一で、騒音を避けて伝えて。",
+        "構造化": "📦 <strong>【傾向】</strong> 整理されていない空間だと、脳が混乱して動きが止まります。<br>💡 <strong>【対応】</strong> 定位置を決め、ラベルを貼る。手順を小分けにしてリスト化しましょう。",
+        "感覚統合": "🌀 <strong>【傾向】</strong> 脳の感覚の受け取り方に個性があります。嫌な感触、好きな感触がハッキリ。<br>💡 <strong>【対応】</strong> 不快な刺激を無理強いせず、好きな刺激（揺れや圧迫）を遊びで満たして。",
+        "実行機能": "⏳ <strong>【傾向】</strong> 切り替えや記憶の保持にエネルギーが必要です。<br>💡 <strong>【対応】</strong> チェックリストや「あと5分」の予告。外付けの司令塔として伴走してあげて。"
     };
-
-    results.ka = { type: top, detail: kaDetails[top] };
-    document.getElementById('ka-res').innerHTML = `<h3>🏠 お子さんの「くらし」環境：${top}の配慮</h3><p>${kaDetails[top]}</p>`;
+    results.ka = { type: top, detail: details[top] };
+    document.getElementById('ka-res').innerHTML = `<h3>🏠 お子さんの「くらし」：${top}の配慮</h3><p>${details[top]}</p>`;
     document.getElementById('ka-res').style.display = 'block';
     checkReady();
 }
 
-// 🌟 条件：2つ以上回答で総合診断へ
 function checkReady() {
     let count = [results.mi, results.ki, results.ka].filter(r => r !== null).length;
     if(count >= 2) {
         document.getElementById('total-btn').disabled = false;
-        document.getElementById('total-btn').innerText = `📊 総合診断を生成 (回答中:${count}/3)`;
+        document.getElementById('total-btn').innerHTML = `📊 総合診断を生成 (${count}/3 回答済)`;
     }
 }
 
 function generateTotalDiagnosis() {
     const miTop = results.mi ? Object.keys(results.mi).reduce((a, b) => results.mi[a] > results.mi[b] ? a : b) : "（未回答）";
-    const kiText = results.ki ? results.ki.detail : "（気質タブの結果を反映させると、さらに詳しくなります）";
-    const kaText = results.ka ? results.ka.detail : "（環境タブの結果を反映させると、さらに詳しくなります）";
-
     let html = `
-        <div class="summary-box" style="border-color:var(--mi-color)"><b>【強み】の活かし方：</b><br>${results.mi ? results.mi[miTop] + "点！ 「" + miTop + "的な活動」を日常のあらゆる入り口にしましょう。" : "回答がありません"}</div>
-        <div class="summary-box" style="border-color:var(--ki-color)"><b>【気質】の合わせ方：</b><br>${kiText}</div>
-        <div class="summary-box" style="border-color:var(--ka-color)"><b>【環境】の整え方：</b><br>${kaText}</div>
-        <div style="background:#fff7f7; padding:20px; border-radius:15px; border:2px dashed #ff7f7f;">
-            <b>💡 総合伴走アドバイス：</b><br>
-            今のこの子に最適なのは、<b>「${miTop}の強み」を活かしつつ、「${results.ka ? results.ka.type : '環境'}」の工夫でハードルを下げるアプローチ</b>です。
-            ${results.ki ? results.ki.type + 'な気質' : '今の性格'}を尊重し、大人が先回りして「環境調整（ハード）」をしてあげる部分と、本人が「自分で環境を調整できるよう対話（ソフト）」を繰り返す部分のバランスを、ここから一緒に探っていきましょう。
+        <div class="summary-box" style="border-left-color:var(--mi-color)">🤝 <strong>「強み」を活かす</strong><br>${miTop}の力を活用しましょう。得意なことで自信を貯金していく時期です。</div>
+        <div class="summary-box" style="border-left-color:var(--ki-color)">🫂 <strong>「気質」に寄り添う</strong><br>${results.ki ? results.ki.detail : '性格を尊重した声かけを。'}</div>
+        <div class="summary-box" style="border-left-color:var(--ka-color)">🏗️ <strong>「環境」を整える</strong><br>${results.ka ? results.ka.detail : '過ごしやすい場作りを。'}</div>
+        <div style="background:#fff7f7; padding:20px; border-radius:15px; border:2px dashed #ff7f7f; font-size:0.9rem; line-height:1.7;">
+            <strong>💎 総合伴走アドバイス：</strong><br>
+            お子さんの行動には必ず「理由」があります。${results.ka ? results.ka.type : '環境'}の調整で物理的なハードルを下げ、${miTop}の強みで「できた！」を増やしましょう。<br><br>
+            大切なのは、大人がお子さんの「通訳者」になること。この子の素晴らしい個性が、今の環境の中で一番良い形で発揮されるよう、一歩引いて、そして隣に座って見守っていきましょう。
         </div>`;
     document.getElementById('total-content').innerHTML = html;
 }
 
-// タブ制御
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn, .tab-content').forEach(el => el.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById(btn.dataset.tab).classList.add('active');
-        if(btn.dataset.tab === 'total') generateTotalDiagnosis();
+        if(btn.dataset.tab === 'total') {
+            generateTotalDiagnosis();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
     });
 });
 
@@ -266,7 +274,7 @@ function saveImage() {
     const area = document.getElementById('capture-area');
     html2canvas(area).then(canvas => {
         const link = document.createElement('a');
-        link.download = 'diagnosis-result.png';
+        link.download = 'kodomo-support-nav.png';
         link.href = canvas.toDataURL();
         link.click();
     });
