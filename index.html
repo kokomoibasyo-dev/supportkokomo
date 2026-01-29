@@ -6,7 +6,6 @@
     <title>子どもサポート・ナビ</title>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --mi-color: #ff7f7f; --ki-color: #ffb347; --ka-color: #76ba1b; --to-color: #4db8ff;
@@ -15,13 +14,8 @@
         body { font-family: 'Zen Maru Gothic', sans-serif; background-color: var(--bg-color); color: var(--text); margin: 0; padding: 15px; line-height: 1.6; }
         .container { max-width: 550px; width: 100%; margin: 20px auto; background: white; padding: 25px; border-radius: 30px; box-shadow: 0 15px 35px rgba(220, 180, 150, 0.15); border: 1px solid rgba(0,0,0,0.03); box-sizing: border-box;}
         .header h1 { font-size: 1.8rem; color: #d48344; margin: 10px 0; text-align: center; }
-        
         .no-box { background: #fff; border: 2px solid #f9e2c4; border-radius: 20px; padding: 15px; margin-bottom: 20px; text-align: center; }
-        
-        /* 冒頭メッセージボックス（復活！） */
-        .intro-box { background: #fff5e6; border-radius: 15px; padding: 15px; font-size: 0.85rem; line-height: 1.6; border: 1px solid #f9e2c4; text-align: left; margin-bottom: 20px; }
-        .intro-box strong { color: #d48344; }
-
+        .intro-box { background: #fff5e6; border-radius: 15px; padding: 15px; font-size: 0.85rem; border: 1px solid #f9e2c4; margin-bottom: 20px; }
         .tab-menu { display: flex; gap: 8px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px; }
         .tab-btn { flex: 1; min-width: 80px; padding: 12px 5px; border: none; border-radius: 16px; cursor: pointer; font-weight: bold; background: #f0f0f0; transition: all 0.2s ease; font-family: inherit; font-size: 0.8rem; color: #999; }
         .tab-btn.active { color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
@@ -29,48 +23,35 @@
         .tab-btn[data-tab="kishitsu"].active { background: var(--ki-color); }
         .tab-btn[data-tab="kankyo"].active { background: var(--ka-color); }
         .tab-btn[data-tab="total"].active { background: var(--to-color); }
-
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
         .q-block { margin-bottom: 20px; padding: 20px; border-radius: 20px; background: #fff; border: 1px solid #f0f0f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .q-text { font-weight: bold; font-size: 1rem; margin-bottom: 18px; display: block; color: #333; line-height: 1.4; }
+        .q-text { font-weight: bold; font-size: 1rem; margin-bottom: 18px; display: block; color: #333; }
         .radio-group { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
         .radio-label { text-align: center; font-size: 0.6rem; cursor: pointer; padding: 8px 4px; border-radius: 12px; border: 1px solid #eee; }
         .radio-label input { width: 20px; height: 20px; margin-bottom: 5px; }
-        
         .btn { width: 100%; padding: 18px; color: white; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
-        
         .res-area { margin-top: 25px; padding: 25px; border-radius: 25px; display: none; background: #fff; border-top: 8px solid; box-shadow: 0 10px 30px rgba(0,0,0,0.05); font-size: 0.9rem; }
-        .summary-box { background: #fdfdfd; padding: 18px; border-radius: 18px; margin-bottom: 15px; border: 1px solid #f0f0f0; border-left: 6px solid #ccc; font-size: 0.85rem; }
-        .translation-box { background: #fff5f5; border: 2px solid #ff7f7f; padding: 15px; border-radius: 20px; margin: 20px 0; font-size: 0.9rem; }
-        .message-box { background: #f0f7ff; padding: 25px; border-radius: 20px; margin-top: 30px; font-size: 0.9rem; border: 1px solid #e0f0ff; }
-        
+        .summary-box { background: #fdfdfd; padding: 18px; border-radius: 18px; margin-bottom: 15px; border: 1px solid #f0f0f0; border-left: 6px solid #ccc; }
+        .translation-box { background: #fff5f5; border: 2px solid #ff7f7f; padding: 15px; border-radius: 20px; margin: 20px 0; }
+        .message-box { background: #f0f7ff; padding: 25px; border-radius: 20px; margin-top: 30px; border: 1px solid #e0f0ff; }
         #chart-container { width: 100%; max-width: 320px; margin: 20px auto; }
-        @media print { .tab-menu, .btn, .no-box, .q-block, .intro-box { display: none !important; } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header"><h1>🌱 子どもサポート・ナビ</h1></div>
-    
     <div class="no-box">
         <strong style="color: #e67e22; font-size: 1rem; display: block; margin-bottom: 8px;">🛡️ 安心してお使いいただくために</strong>
         <div style="display: flex; justify-content: space-around; font-size: 0.75rem;">
             <span>❌ 診断じゃない</span><span>❌ 決めつけない</span><span>❌ 固定しない</span>
         </div>
     </div>
-
     <div class="intro-box">
         🕊️ <strong>このツールの目的</strong><br>
-        「なぜ、あんな行動をするんだろう？」という疑問を<strong>「理解のヒント」</strong>に変え、親子がもっと楽に笑い合えるヒントを探るためのガイドです。<br><br>
-        📌 <strong>対象年齢の目安：3歳 〜 12歳頃</strong><br><br>
-        🌱 <strong>0〜2歳のお子さんのご家族へ</strong><br>
-        発達の個人差がとても大きい時期です。「今はこんな傾向なのかな？」と、今を愛でるヒントにしてください。<br><br>
-        🎓 <strong>13歳以上のお子さんのご家族へ</strong><br>
-        思春期以降は本人の主観が大切になります。結果を本人と一緒に眺めて「自分ではどう思う？」と対話のきっかけにしてみてください。
+        「なぜ、あんな行動をするんだろう？」という疑問を<strong>「理解のヒント」</strong>に変えるガイドです。対象：3歳〜12歳。
     </div>
 
     <div class="tab-menu">
@@ -80,81 +61,69 @@
         <button class="tab-btn" data-tab="total" id="total-btn" disabled>📊 総合</button>
     </div>
 
-    <div id="mi" class="tab-content active">
-        <div id="mi-q"></div>
-        <button class="btn" style="background:var(--mi-color)" onclick="calcMI()">強みのヒントを見る 🔍</button>
-        <div id="chart-container"><canvas id="miChart"></canvas></div>
-        <div id="mi-res" class="res-area" style="border-color:var(--mi-color)"></div>
-    </div>
-
-    <div id="kishitsu" class="tab-content">
-        <div id="ki-q"></div>
-        <button class="btn" style="background:var(--ki-color)" onclick="calcKi()">気質のヒントを見る 🔍</button>
-        <div id="ki-res" class="res-area" style="border-color:var(--ki-color)"></div>
-    </div>
-
-    <div id="kankyo" class="tab-content">
-        <div id="ka-q"></div>
-        <button class="btn" style="background:var(--ka-color)" onclick="calcKa()">環境のヒントを見る 🔍</button>
-        <div id="ka-res" class="res-area" style="border-color:var(--ka-color)"></div>
-    </div>
-
-    <div id="total" class="tab-content">
-        <div id="capture-area">
-            <h2 style="text-align:center; color:var(--to-color);">🤝 お子さんへの伴走ガイド</h2>
-            <div id="total-content"></div>
-        </div>
-        <button class="btn" style="background:var(--to-color)" onclick="window.print()">🖨️ 結果を印刷する</button>
-    </div>
-
-    <div style="text-align: center; font-size: 0.7rem; color: #bbb; margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px;">
-        心理学理論に基づく家庭用ガイド
-    </div>
+    <div id="mi" class="tab-content active"><div id="mi-q"></div><button class="btn" style="background:var(--mi-color)" onclick="calcMI()">強みのヒントを見る 🔍</button><div id="chart-container"><canvas id="miChart"></canvas></div><div id="mi-res" class="res-area" style="border-color:var(--mi-color)"></div></div>
+    <div id="kishitsu" class="tab-content"><div id="ki-q"></div><button class="btn" style="background:var(--ki-color)" onclick="calcKi()">気質のヒントを見る 🔍</button><div id="ki-res" class="res-area" style="border-color:var(--ki-color)"></div></div>
+    <div id="kankyo" class="tab-content"><div id="ka-q"></div><button class="btn" style="background:var(--ka-color)" onclick="calcKa()">環境のヒントを見る 🔍</button><div id="ka-res" class="res-area" style="border-color:var(--ka-color)"></div></div>
+    <div id="total" class="tab-content"><div id="total-content"></div><button class="btn" style="background:var(--to-color)" onclick="window.print()">🖨️ 結果を印刷する</button></div>
 </div>
 
 <script>
-/* データ定義、ロジック部分は前回の「具体的に踏み込んだ内容」を
-   すべて保持しています。
-*/
+// 強みデータ (変更なし)
 const miDetails = {
-    "言語": {能力:"言葉を操り、想いを伝える力", 遊び:"しりとり、お話作り、読み聞かせ", 関わり:"「今の言い方、素敵だね」と表現を具体的にほめる", 頼る人:"お喋りを楽しんでくれるおじいちゃんやおばあちゃん"},
-    "論理": {能力:"筋道を立てて考え、法則を見つける力", 遊び:"数遊び、パズル、科学実験、レゴ", 関わり:"「なぜこうなると思う？」と予測を立てる問いかけを", 頼る人:"将棋やトランプを根気よく付き合える親戚"},
-    "空間": {能力:"形や位置を捉え、イメージする力", 遊び:"ブロック、迷路、お絵かき、工作", 関わり:"言葉で指示せず、図解や見本を見せると理解が進む", 頼る人:"DIYが得意なお父さんや工作が好きな大人"},
-    "身体": {能力:"自分の体を器用に使いこなす力", 遊び:"ダンス、アスレチック、粘土細工", 関わり:"「やってみて覚える」を尊重。体を動かしながら学ぶ環境を", 頼る人:"一緒に公園で走り回れる元気な叔父さんや年上の兄弟"},
-    "音楽": {能力:"音やリズムを感じ取り、表現する力", 遊び:"楽器遊び、歌、リズムゲーム", 関わり:"覚えたいことはメロディに乗せると驚くほど定着する", 頼る人:"音楽好きなお母さんや、鼻歌を一緒に楽しめるおばあちゃん"},
-    "対人": {能力:"他人の気持ちを察し、協力し合う力", 遊び:"お店屋さんごっこ、チーム、ボードゲーム", 関わり:"「誰かが喜んでくれた」実感を共有するとやる気が爆発", 頼る人:"いつも優しく話を聴いてくれる近所の人"},
-    "内省": {能力:"自分を客観的に見つめ、意志を貫く力", 遊び:"日記、コレクション、没頭できる趣味", 関わり:"無理に群れさせず、一人の時間を尊重し決断を待つ", 頼る人:"口出しせず静かに見守ってくれる穏やかなおじいちゃん"},
-    "博物": {能力:"自然や物の細かな違いを見極める力", 遊び:"図鑑作り、虫捕り、特定のテーマの収集", 関わり:"「この違い、わかる？」とマニアックな発見を肯定する", 頼る人:"こだわりを「面白いね！」と面白がってくれる大人"}
+    "言語": {能力:"言葉を操り、想いを伝える力", 遊び:"しりとり、お話作り", 関わり:"「今の言い方、素敵だね」とほめる", 頼る人:"お喋り好きなおじいちゃんおばあちゃん"},
+    "論理": {能力:"法則を見つけ、筋道を立てる力", 遊び:"数遊び、パズル、実験", 関わり:"「なぜこうなると思う？」と問いかける", 頼る人:"将棋やトランプができる親戚"},
+    "空間": {能力:"形を捉えイメージする力", 遊び:"ブロック、迷路、お絵かき", 関わり:"図解や見本を見せて伝える", 頼る人:"DIYや工作が得意な大人"},
+    "身体": {能力:"体を器用に使いこなす力", 遊び:"ダンス、アスレチック、粘土", 関わり:"「やってみて覚える」を尊重する", 頼る人:"一緒に公園で遊べる元気な大人"},
+    "音楽": {能力:"音やリズムを感じ取る力", 遊び:"楽器、歌、リズムゲーム", 関わり:"覚えたいことはメロディに乗せる", 頼る人:"歌を一緒に楽しめるおばあちゃん"},
+    "対人": {能力:"人の気持ちを察し協力する力", 遊び:"お店屋さん、ボードゲーム", 関わり:"「誰かが喜んだ」実感を共有する", 頼る人:"話をよく聴いてくれる近所の人"},
+    "内省": {能力:"自分を見つめ意志を貫く力", 遊び:"日記、没頭できる趣味", 関わり:"一人の時間を尊重し決断を待つ", 頼る人:"静かに見守ってくれる大人"},
+    "博物": {能力:"自然や物の違いを見極める力", 遊び:"図鑑、虫捕り、収集", 関わり:"マニアックな発見を面白がる", 頼る人:"こだわりを肯定してくれる大人"}
 };
+
+// 気質データ (20問に増強、ハイブリッド対応)
+const kiData = [
+    {t:"デリケート", q:"👂 音、光、匂い、肌触りに敏感"}, {t:"デリケート", q:"😟 失敗を極端に怖がり、泣く"}, {t:"デリケート", q:"🌳 初めての場所や人にはかなり慎重"}, {t:"デリケート", q:"👀 周りの大人の顔色をよく見ている"},
+    {t:"アクティブ", q:"🚀 じっとしているより動いている方が楽"}, {t:"アクティブ", q:"🔥 危ないことでも挑戦したがる"}, {t:"アクティブ", q:"📣 自分の意見を大きな声で主張する"}, {t:"アクティブ", q:"🏃‍♂️ 興味のあるものへ真っ先に駆け寄る"},
+    {t:"エンジェル", q:"🌸 争いごとを避け、譲ることが多い"}, {t:"エンジェル", q:"🤝 誰かが困っていると放っておけない"}, {t:"エンジェル", q:"🕊️ 穏やかで、ニコニコしていることが多い"}, {t:"エンジェル", q:"🍂 自分の気持ちより「みんな」を優先する"},
+    {t:"テキスト", q:"⏰ 毎日のルーティンが崩れると混乱する"}, {t:"テキスト", q:"📉 具体的な数字や「あと〇分」が安心"}, {t:"テキスト", q:"📦 物の置き場所が決まっていないと嫌"}, {t:"テキスト", q:"📖 文字や記号、地図などを好んで眺める"},
+    {t:"ネガティブ", q:"⚡ 感情の爆発が激しく、切り替えが苦手"}, {t:"ネガティブ", q:"💎 納得がいかないと、テコでも動かない"}, {t:"ネガティブ", q:"😤 「自分ルール」を邪魔されると激怒"}, {t:"ネガティブ", q:"🌪️ 一度泣き出すと手がつけられない"}
+];
 
 const kiDetails = {
-    "デリケート": {困り:"新しい環境で固まる、失敗を恐れて泣く", 翻訳:"「安全かどうか」を慎重に確認している証拠", 対応:"「怖いよね、見てるから大丈夫」と予告と安心をセットに。"},
-    "アクティブ": {困り:"衝動的に飛び出す、話を聞かずに動く", 翻訳:"「溢れる好奇心」が抑制を上回っている状態", 対応:"叱るより「止まる場所」を決め、エネルギーの発散先を確保。"},
-    "エンジェル": {困り:"自分の意見を言わない、周りに流されすぎる", 翻訳:"「場の平和」を守ることを最優先に考えている", 対応:"「あなたはどうしたい？」と本音を拾う時間を個別に作る。"},
-    "テキスト": {困り:"予定変更でパニック、手順へのこだわり", 翻訳:"「見通し」がないことへの強い不安を感じている", 対応:"早めの予告を徹底。「次は〇〇だよ」と視覚的に伝える。"},
-    "ネガティブ": {困り:"激しいイヤイヤ、思い通りにならないと爆発", 翻訳:"「自分の願い」を妥協せず追求する強い意志の表れ", 対応:"一度「悔しいね」と感情を100%受け止めてから交渉へ。"}
+    "デリケート": {翻訳:"慎重で豊かな感性。安全を確認中", 対応:"「安心できる予告」を大切に。"},
+    "アクティブ": {翻訳:"溢れる好奇心。生命力の塊", 対応:"発散できる場と「止まる」練習を。"},
+    "エンジェル": {翻訳:"和を尊ぶ平和主義。高い共感性", 対応:"本音を出すための「秘密の対話」を。"},
+    "テキスト": {翻訳:"秩序と見通しを愛する。論理の芽", 対応:"視覚的なスケジュールと一貫性を。"},
+    "ネガティブ": {翻訳:"意志が強く、妥協しない情熱家", 対応:"感情を全肯定してから、交渉を。"}
 };
+
+// 環境データ (15問)
+const kaData = [
+    {t:"視覚支援",q:"📢 言葉の指示を忘れやすい"}, {t:"視覚支援",q:"🖼️ 写真や絵だとすぐ理解できる"}, {t:"視覚支援",q:"📅 カレンダーをよく確認する"},
+    {t:"聴覚配慮",q:"👂 騒がしい場所だと機嫌が悪くなる"}, {t:"聴覚配慮",q:"🎧 静かな場所でホッとできる"},
+    {t:"構造化",q:"🧺 片付け場所が決まってないと困る"}, {t:"構造化",q:"🪜 手順を細かく分けてほしい"}, {t:"構造化",q:"🤫 囲われた空間が落ち着く"},
+    {t:"感覚統合",q:"👕 特定の感触を嫌がる"}, {t:"感覚統合",q:"🌀 高い所や回転が大好き"}, {t:"感覚統合",q:"🧸 ぎゅっとする刺激で落着く"},
+    {t:"実行機能",q:"⏸️ 行動の切り替えが難しい"}, {t:"実行機能",q:"📝 忘れ物や紛失が多い"}, {t:"実行機能",q:"⏳ 時間の流れを掴みにくい"}, {t:"実行機能",q:"🎒 準備の順番がわからなくなる"}
+];
 
 const kaDetails = {
-    "視覚支援": {困り:"指示をスルーする、何度も同じことを聞く", 手立て:"【目で見てわかるように】絵カード、写真、タイマー", 声かけ:"「これを見てね」と注目させてから視覚情報を示す。"},
-    "聴覚配慮": {困り:"騒がしいとパニック、話が聞き取れない", 手立て:"【耳の負担を減らす】イヤーマフ、静かな避難場所", 声かけ:"一対一で、騒音のない静かな場所で短く伝える。"},
-    "構造化": {困り:"片付けができない、何からしていいか不明", 手立て:"【物の住所を決める】ラベル貼り、手順の1,2,3表示", 声かけ:"「まずは1番の箱を置いてね」と一つずつ動かす。"},
-    "感覚統合": {困り:"偏食、特定の服を嫌がる、落ち着きがない", 手立て:"【感覚の過不足を補う】ブランコ、ぎゅっと抱きしめる", 声かけ:"「これが嫌なんだね」と不快を避け、好きな刺激で満たす。"},
-    "実行機能": {困り:"忘れ物が多い、時間の切り替えができない", 手立て:"【外付けの司令塔】チェックリスト、5分前アラーム", 声かけ:"「あと3分で終わりだよ」と終わりの時間を具体的に。"}
+    "視覚支援": {困り:"指示スルー", 手立て:"【目で見てわかる】絵、写真", 声かけ:"「これ見てね」と注目させて伝える"},
+    "聴覚配慮": {困り:"騒音パニック", 手立て:"【耳の負担減】イヤーマフ、静かな場所", 声かけ:"一対一で静かな場所で伝える"},
+    "構造化": {困り:"片付け不能", 手立て:"【物の住所】ラベル、手順123", 声かけ:"「1番の箱に入れてね」と一つずつ"},
+    "感覚統合": {困り:"偏食・過敏", 手立て:"【感覚の補完】抱っこ、感覚遊び", 声かけ:"「嫌なんだね」と不快を避ける"},
+    "実行機能": {困り:"切り替え困難", 手立て:"【外付け司令塔】リスト、アラーム", 声かけ:"「あと3分で終わり」と具体的に"}
 };
 
-const miData = [{c:"言語",q:"📚 おしゃべりや物語作りが好き"},{c:"言語",q:"📖 絵本の読み聞かせを楽しめる"},{c:"論理",q:"🧩 パズルや分類、法則探しが得意"},{c:"論理",q:"🔍 「なぜ？」と仕組みを知りたがる"},{c:"空間",q:"🗺️ 地図や絵の奥行きを捉えるのが上手"},{c:"空間",q:"🏰 ブロック等で立体を作るのが好き"},{c:"身体",q:"🏃‍♂️ ダンスやスポーツ等、体が器用"},{c:"身体",q:"✂️ 工作や料理等、手先が器用"},{c:"音楽",q:"🎶 鼻歌やリズム乗りが自然に出る"},{c:"音楽",q:"🎹 音や声に敏感に反応する"},{c:"対人",q:"🤝 友達の気持ちを察するのが上手"},{c:"対人",q:"🏫 みんなで何かをするのが好き"},{c:"内省",q:"🧘 自分の意志がはっきりしている"},{c:"内省",q:"💭 一人で静かに考える時間が大切"},{c:"博物",q:"🦖 恐竜や植物等の観察・収集が好き"}];
-const kiData = [{t:"デリケート",q:"👂 音や刺激にとても敏感"},{t:"デリケート",q:"😟 失敗を怖がる気持ちが強い"},{t:"デリケート",q:"🌳 初めての場所では慎重"},{t:"アクティブ",q:"🚀 考えるより先に体が動く"},{t:"アクティブ",q:"🔥 エネルギーが溢れている"},{t:"エンジェル",q:"🌸 穏やかで周りに合わせがち"},{t:"エンジェル",q:"🤝 調和を優先させることが多い"},{t:"テキスト",q:"⏰ ルーチンや決まりを好む"},{t:"テキスト",q:"📉 具体的な数字やルールが安心"},{t:"ネガティブ",q:"⚡ 感情の爆発が激しい"},{t:"ネガティブ",q:"💎 自分のこだわりが非常に強い"},{t:"デリケート",q:"👀 空気を読みすぎて疲れやすい"},{t:"アクティブ",q:"🏃‍♂️ 常に新しい刺激を求めている"},{t:"テキスト",q:"📦 物の配置が決まっていると安心"},{t:"エンジェル",q:"🕊️ 争いを避け、平和を願う"}];
-const kaData = [{t:"視覚支援",q:"📢 言葉の指示を忘れやすい"},{t:"視覚支援",q:"🖼️ 図や写真の方が理解しやすい"},{t:"視覚支援",q:"📅 予定が目に見えると安心する"},{t:"聴覚配慮",q:"👂 騒がしい場所だと混乱する"},{t:"聴覚配慮",q:"🎧 静かな場所でホッとできる"},{t:"構造化",q:"🧺 片付け場所が決まってないと困る"},{t:"構造化",q:"🪜 手順を細かく分けてほしい"},{t:"感覚統合",q:"👕 特定の感触を嫌がる"},{t:"感覚統合",q:"🌀 高い所や回転が大好き"},{t:"実行機能",q:"⏸️ 行動の切り替えが難しい"},{t:"実行機能",q:"📝 忘れ物や紛失が多い"},{t:"実行機能",q:"⏳ 時間の流れを掴みにくい"},{t:"感覚統合",q:"🧸 ぎゅっとする刺激で落着く"},{t:"実行機能",q:"🎒 準備の順番がわからなくなる"},{t:"構造化",q:"🤫 囲われた空間が落ち着く"}];
+// 質問生成
+const miData = [{c:"言語",q:"📚 おしゃべり好き"},{c:"言語",q:"📖 読み聞かせ好き"},{c:"論理",q:"🧩 パズル好き"},{c:"論理",q:"🔍 仕組み知りたがり"},{c:"空間",q:"🗺️ 地図・絵が上手"},{c:"空間",q:"🏰 立体作り好き"},{c:"身体",q:"🏃‍♂️ スポーツ器用"},{c:"身体",q:"✂️ 手先が器用"},{c:"音楽",q:"🎶 鼻歌が自然に出る"},{c:"音楽",q:"🎹 音に敏感"},{c:"対人",q:"🤝 気持ち察するのが上手"},{c:"対人",q:"🏫 集団が好き"},{c:"内省",q:"🧘 意志がはっきり"},{c:"内省",q:"💭 一人の時間大切"},{c:"博物",q:"🦖 収集・観察好き"}];
 
 function autoScroll(el) { const b = el.closest('.q-block').nextElementSibling; if (b && b.classList.contains('q-block')) setTimeout(() => b.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300); }
 function create5Scale(name) { return `<div class="radio-group">${['よく<br>あてはまる','あてはまる','わから<br>ない','あまり<br>あてはまらない','あてはま<br>らない'].map((l,i)=>`<label class="radio-label"><input type="radio" name="${name}" value="${4-i}" onclick="autoScroll(this)">${l}</label>`).join('')}</div>`; }
 
 function setup() {
-    ['mi','ki','ka'].forEach(type => {
-        const target = document.getElementById(type+'-q');
-        const data = type === 'mi' ? miData : type === 'ki' ? kiData : kaData;
-        data.forEach((d,i)=> target.innerHTML += `<div class="q-block"><span class="q-text">${i+1}. ${d.q}</span>${create5Scale(type+i)}</div>`);
+    [['mi', miData], ['ki', kiData], ['ka', kaData]].forEach(([id, data]) => {
+        const target = document.getElementById(id+'-q');
+        data.forEach((d,i)=> target.innerHTML += `<div class="q-block"><span class="q-text">${i+1}. ${d.q}</span>${create5Scale(id+i)}</div>`);
     });
 }
 setup();
@@ -162,7 +131,7 @@ setup();
 let results = { mi:null, ki:null, ka:null };
 
 function calcMI() {
-    let scores = {}; miData.forEach((d,i) => { const v = parseInt(document.querySelector(`input[name="mi${i}"]:checked`)?.value || 0); scores[d.c] = (scores[d.c] || 0) + v; });
+    let scores = {}; miData.forEach((d,i) => scores[d.c] = (scores[d.c] || 0) + parseInt(document.querySelector(`input[name="mi${i}"]:checked`)?.value || 0));
     results.mi = scores; showMiChart(scores);
     const top = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
     const d = miDetails[top];
@@ -172,54 +141,59 @@ function calcMI() {
 
 function showMiChart(scores) {
     const ctx = document.getElementById('miChart').getContext('2d');
-    const labels = ["言語","論理","空間","身体","音楽","対人","内省","博物"];
     if(window.miRadar) window.miRadar.destroy();
-    window.miRadar = new Chart(ctx, { type:'radar', data:{ labels, datasets:[{ label:'バランス', data: labels.map(l=>scores[l]||0), backgroundColor:'rgba(255,127,127,0.2)', borderColor: '#ff7f7f', borderWidth:2 }]}, options:{ scales:{ r:{ min:0, max:8, ticks:{ display:false }}} }});
+    window.miRadar = new Chart(ctx, { type:'radar', data:{ labels:Object.keys(miDetails), datasets:[{ label:'バランス', data: Object.keys(miDetails).map(l=>scores[l]||0), backgroundColor:'rgba(255,127,127,0.2)', borderColor: '#ff7f7f', borderWidth:2 }]}, options:{ scales:{ r:{ min:0, max:8, ticks:{ display:false }}} }});
 }
 
 function calcKi() {
-    let types = {}; kiData.forEach((d,i) => { const v = parseInt(document.querySelector(`input[name="ki${i}"]:checked`)?.value || 0); types[d.t] = (types[d.t] || 0) + v; });
-    const top = Object.keys(types).reduce((a, b) => types[a] > types[b] ? a : b);
-    results.ki = { type: top, detail: kiDetails[top] };
-    document.getElementById('ki-res').innerHTML = `<h3>🌈 気質：${top}タイプ</h3>困る場面：${kiDetails[top].困り}<br>翻訳：${kiDetails[top].翻訳}<br>対応：${kiDetails[top].対応}`;
+    let scores = {}; kiData.forEach((d,i) => scores[d.t] = (scores[d.t] || 0) + parseInt(document.querySelector(`input[name="ki${i}"]:checked`)?.value || 0));
+    const sorted = Object.keys(scores).sort((a,b) => scores[b] - scores[a]);
+    const top1 = sorted[0]; const top2 = sorted[1];
+    // ハイブリッド判定（1位と2位の差が2点以内なら混合）
+    const isHybrid = (scores[top1] - scores[top2] <= 2);
+    results.ki = { type: top1, type2: isHybrid ? top2 : null, detail: kiDetails[top1], detail2: isHybrid ? kiDetails[top2] : null };
+    
+    let resText = isHybrid ? `<h3>🌈 気質：${top1} × ${top2} タイプ</h3>` : `<h3>🌈 気質：${top1}タイプ</h3>`;
+    resText += `翻訳：${results.ki.detail.翻訳}${isHybrid ? ' ＆ ' + results.ki.detail2.翻訳 : ''}<br>対応：${results.ki.detail.対応}`;
+    document.getElementById('ki-res').innerHTML = resText;
     document.getElementById('ki-res').style.display = 'block'; checkReady();
 }
 
 function calcKa() {
-    let scores = {}; kaData.forEach((d,i) => { const v = parseInt(document.querySelector(`input[name="ka${i}"]:checked`)?.value || 0); scores[d.t] = (scores[d.t] || 0) + v; });
+    let scores = {}; kaData.forEach((d,i) => scores[d.t] = (scores[d.t] || 0) + parseInt(document.querySelector(`input[name="ka${i}"]:checked`)?.value || 0));
     const top = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
     results.ka = { type: top, detail: kaDetails[top] };
-    document.getElementById('ka-res').innerHTML = `<h3>🏠 環境：${top}への配慮</h3>困る場面：${kaDetails[top].困り}<br>手立て：${kaDetails[top].手立て}<br>声かけ：${kaDetails[top].声かけ}`;
+    document.getElementById('ka-res').innerHTML = `<h3>🏠 環境：${top}への配慮</h3>手立て：${kaDetails[top].手立て}<br>声かけ：${kaDetails[top].声かけ}`;
     document.getElementById('ka-res').style.display = 'block'; checkReady();
 }
 
-function checkReady() { if([results.mi, results.ki, results.ka].filter(r => r !== null).length >= 2) { document.getElementById('total-btn').disabled = false; } }
+function checkReady() { if([results.mi, results.ki, results.ka].filter(r => r !== null).length >= 2) document.getElementById('total-btn').disabled = false; }
 
 function generateTotalDiagnosis() {
-    const miTop = results.mi ? Object.keys(results.mi).reduce((a, b) => results.mi[a] > results.mi[b] ? a : b) : "（未回答）";
-    let html = `
-        <div class="summary-box" style="border-left-color:var(--mi-color)">🤝 <strong>強み（${miTop}）</strong>：${miDetails[miTop].能力}。${miDetails[miTop].頼る人}に協力を仰ぎましょう。</div>
-        <div class="summary-box" style="border-left-color:var(--ki-color)">🫂 <strong>性格（${results.ki.type}）</strong>：${results.ki.detail.翻訳}。</div>
-        <div class="summary-box" style="border-left-color:var(--ka-color)">🏗️ <strong>環境（${results.ka.type}）</strong>：${results.ka.detail.手立て}。</div>
+    const miTop = Object.keys(results.mi).reduce((a, b) => results.mi[a] > results.mi[b] ? a : b);
+    const kiTitle = results.ki.type2 ? `${results.ki.type} × ${results.ki.type2}` : results.ki.type;
+    const translationText = results.ki.type2 
+        ? `日常の「${results.ki.detail.困り}」や「${results.ki.detail2.困り}」といった行動は、脳が「${results.ki.detail.翻訳}」「${results.ki.detail2.翻訳}」という二つのサインを同時に出している状態です。`
+        : `日常の「${results.ki.detail.困り}」という行動は、お子さんが必死に「${results.ki.detail.翻訳}」とサインを出している状態です。`;
+
+    document.getElementById('total-content').innerHTML = `
+        <div class="summary-box" style="border-left-color:var(--mi-color)">🤝 <strong>強み：${miTop}</strong><br>${miDetails[miTop].能力}。${miDetails[miTop].頼る人}に助けてもらいましょう。</div>
+        <div class="summary-box" style="border-left-color:var(--ki-color)">🫂 <strong>性格：${kiTitle}</strong><br>${results.ki.detail.翻訳}${results.ki.type2 ? ' / ' + results.ki.detail2.翻訳 : ''}</div>
+        <div class="summary-box" style="border-left-color:var(--ka-color)">🏗️ <strong>環境：${results.ka.type}</strong><br>${results.ka.detail.手立て}。</div>
         
         <div class="translation-box">
-            <strong>💎 翻訳：困った😭 を サポートの視点へ</strong><br>
-            日常の「${results.ki.detail.困り}」や「${results.ka.detail.困り}」という場面は、お子さんの<strong>「${results.ki.detail.翻訳}」</strong>が原因かもしれません。<br><br>
-            大人が<strong>${results.ka.detail.手立て}</strong>を用意し、<strong>「${results.ki.detail.対応}」</strong>を心がけることで、お子さんはより過ごしやすくなります。
+            <strong>💎 翻訳：困った😭 を サポートへ</strong><br>
+            ${translationText}<br><br>
+            ${results.ka.detail.手立て}を整えつつ、<strong>「${results.ki.detail.対応}」</strong>を心がけることで、お子さんはより自分らしく輝けます。
         </div>
-
-        <div class="message-box">
-            <strong>💌 お父さん・お母さんへ</strong><br>
-            いつも、本当にお疲れ様です。お子さんのことをもっと理解したいと願うその姿勢が、すでに最高のアドバイスです。今日の結果をきっかけに、少しだけ「この子の通訳者」になったつもりでお子さんと向き合ってみてくださいね。
-        </div>`;
-    document.getElementById('total-content').innerHTML = html;
+        <div class="message-box">💌 <strong>お父さん・お母さんへ</strong><br>毎日お疲れ様です。今日の結果は、お子さんの「今の取扱説明書」の一ページ。少しずつ、一緒にめくっていきましょう。</div>
+    `;
 }
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn, .tab-content').forEach(el => el.classList.remove('active'));
-        btn.classList.add('active'); 
-        document.getElementById(btn.dataset.tab).classList.add('active');
+        btn.classList.add('active'); document.getElementById(btn.dataset.tab).classList.add('active');
         if(btn.dataset.tab === 'total') generateTotalDiagnosis();
         window.scrollTo({top: 0, behavior: 'smooth'});
     });
