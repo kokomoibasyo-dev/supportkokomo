@@ -12,27 +12,8 @@
             --mi-color: #ff7f7f; --ki-color: #ffb347; --ka-color: #76ba1b; --to-color: #4db8ff;
             --bg-color: #fffaf0; --text: #444;
         }
-        /* bodyのflexを解除し、縦に並ぶよう修正 */
-        body { 
-            font-family: 'Zen Maru Gothic', sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text); 
-            margin: 0; 
-            padding: 10px; 
-            display: block; 
-        }
-        /* コンテナが画面中央に1枚のカードとして表示されるように修正 */
-        .container { 
-            max-width: 600px; 
-            width: 100%; 
-            margin: 20px auto; 
-            background: white; 
-            padding: 20px; 
-            border-radius: 25px; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08); 
-            border: 2px solid #eee; 
-            box-sizing: border-box;
-        }
+        body { font-family: 'Zen Maru Gothic', sans-serif; background-color: var(--bg-color); color: var(--text); margin: 0; padding: 10px; display: block; }
+        .container { max-width: 600px; width: 100%; margin: 20px auto; background: white; padding: 20px; border-radius: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); border: 2px solid #eee; box-sizing: border-box;}
         
         .header { text-align: center; margin-bottom: 25px; }
         .header h1 { font-size: 1.6rem; color: #d48344; margin: 10px 0; }
@@ -66,6 +47,10 @@
         .total-card { padding: 15px; border-radius: 20px; background: white; }
         .summary-box { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #eee; border-left: 8px solid #ccc; font-size: 0.9rem; }
         
+        .praise-box { background: #fffcf0; border: 1px dashed #ffb347; padding: 12px; border-radius: 10px; margin-top: 10px; font-size: 0.85rem; }
+        .message-box { background: #f0f7ff; padding: 20px; border-radius: 15px; border: 2px solid #4db8ff; font-size: 0.9rem; line-height: 1.7; margin-top: 20px; position: relative;}
+        .message-box::before { content: "💌"; position: absolute; top: -15px; left: 20px; font-size: 1.5rem; background: white; padding: 0 5px; }
+
         #chart-container { width: 100%; max-width: 350px; margin: 15px auto; }
         
         @media print { .tab-menu, .btn, .intro-box, .q-block { display: none !important; } .container { border: none; box-shadow: none; } }
@@ -91,11 +76,10 @@
         🕊️ <strong>このツールの目的</strong><br>
         「なぜ、あんな行動をするんだろう？」という疑問を<strong>「理解のヒント」</strong>に変え、親子がもっと楽に、自分らしく笑い合えるコミュニケーションを探るためのガイドです。<br><br>
         
-        📌 <strong>対象年齢の目安：3歳 〜 12歳頃</strong><br>
-        お子さんの発達や特性がはっきり見え始める時期に最もフィットするように作られています。<br><br>
+        📌 <strong>対象年齢の目安：3歳 〜 12歳頃</strong><br><br>
 
         🌱 <strong>0〜2歳のお子さんのご家族へ</strong><br>
-        発達の個人差がとても大きい時期です。結果を固定せず、「今はこんな傾向なのかな？」と、今この瞬間の姿を愛でるヒントにしてください。<br><br>
+        発達の個人差がとても大きい時期です。「今はこんな傾向なのかな？」と、今を愛でるヒントにしてください。<br><br>
 
         🎓 <strong>13歳以上のお子さんのご家族へ</strong><br>
         思春期以降は本人の主観が大切になります。結果を本人と一緒に眺めて「自分ではどう思う？」と対話のきっかけにしてみてください。
@@ -140,9 +124,11 @@
     </div>
 
     <div style="text-align: center; font-size: 0.7rem; color: #999; margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">
-        ※本ツールは、ハワード・ガードナーのMI理論および児童心理学の気質理論を参考に制作された「家庭向け教育支援ヒント」です。医療機関による診断に代わるものではありません。
+        ※本ツールは、ハワード・ガードナーのMI理論および児童心理学の気質理論を参考に制作された家庭向け支援ヒントです。医療機関による診断に代わるものではありません。
     </div>
-</div> <script>
+</div>
+
+<script>
 function create5Scale(name) {
     return `
     <div class="radio-group">
@@ -154,6 +140,7 @@ function create5Scale(name) {
     </div>`;
 }
 
+// 質問データ
 const miData = [
     { c: "言語", q: "📚 難しい言葉を使ったり、おしゃべりを楽しんだりする" }, { c: "言語", q: "📖 絵本の読み聞かせや、物語を作るのが好き" },
     { c: "論理", q: "🧩 パズルや、モノを並べて分類するのが得意" }, { c: "論理", q: "🔍 「なぜ？どうして？」と仕組みを知りたがる" },
@@ -195,6 +182,18 @@ setup();
 
 let results = { mi:null, ki:null, ka:null };
 
+// ほめ言葉データ
+const praiseData = {
+    "言語": "👄 「そんな難しい言葉を知ってるんだね！」「あなたの話は面白いね！」",
+    "論理": "🔢 「なるほど、そう考えたんだね！」「今の説明、すごく分かりやすかったよ」",
+    "空間": "🎨 「色使いが素敵だね！」「頭の中に設計図があるみたいだね」",
+    "身体": "🤸 「今の動き、かっこよかった！」「一生懸命練習してたもんね」",
+    "音楽": "🎵 「いいリズムだね！」「その歌を聴くと、みんなも楽しくなるよ」",
+    "対人": "👫 「優しいね、友達も喜んでるよ」「あなたの周りはいつも笑顔だね」",
+    "内省": "🧘 「自分の考えをしっかり持ってるね」「今のこだわり、大切にしよう」",
+    "博物": "🌲 「物知りだね！先生みたい！」「そんな細かい違いに気づくなんてすごい」"
+};
+
 function calcMI() {
     let scores = {};
     miData.forEach((d,i) => {
@@ -205,18 +204,10 @@ function calcMI() {
     showMiChart(scores);
     const top = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
     
-    const details = {
-        "言語": "👄 <strong>【あるある】</strong> 言葉の面白さに敏感！大人と対等に話したがることがあります。<br>💡 <strong>【ヒント】</strong> 「対話」を通して教えるのが効果的。物語や比喩を使うとスッと伝わります。",
-        "論理": "🔢 <strong>【あるある】</strong> 納得感重視！「なぜダメなの？」の理由を論理的に知りたがります。<br>💡 <strong>【ヒント】</strong> ルールを可視化し、根拠を説明すると納得して動けます。数字も大好き。",
-        "空間": "🎨 <strong>【あるある】</strong> 頭の中にカメラがある！言葉で聞くより、図や映像で見る方が得意です。<br>💡 <strong>【ヒント】</strong> 図解、動画、写真。目で見て分かる情報を増やすと、劇的に理解が進みます。",
-        "身体": "🤸 <strong>【あるある】</strong> 考えるより先に体が動く！実際にやってみることで理解を深めます。<br>💡 <strong>【ヒント】</strong> 体験型学習がベスト。体を動かしながらの方が、脳も活発に動きます。",
-        "音楽": "🎵 <strong>【あるある】</strong> リズムで生きている！鼻歌を歌いながらの方が作業が捗ることも。<br>💡 <strong>【ヒント】</strong> 歌にして覚える、BGMを活用する。聴覚的なアクセントがやる気を引き出します。",
-        "対人": "👫 <strong>【あるある】</strong> 空気を読む名人！誰かの役に立ちたいという気持ちが強いです。<br>💡 <strong>【ヒント】</strong> ペア学習や、誰かを助ける「役割」を与えると、大きな力を発揮します。",
-        "内省": "🧘 <strong>【あるある】</strong> 自分のペースを守る人！自分に厳しく、納得してから動きたいタイプ。<br>💡 <strong>【ヒント】</strong> 一人で考える時間を尊重して。自分で選ばせることで自立心が育ちます。",
-        "博物": "🌲 <strong>【あるある】</strong> 観察の天才！好きな分野の細かな違いを驚くほど見つけます。<br>💡 <strong>【ヒント】</strong> 興味のある対象（例：電車、虫）をあらゆる学びに結びつけて伴走しましょう。"
-    };
-
-    document.getElementById('mi-res').innerHTML = `<h3>🌟 お子さんの「きらり」：${top}的な強み</h3><p>${details[top]}</p>`;
+    document.getElementById('mi-res').innerHTML = `
+        <h3>🌟 お子さんの「きらり」：${top}的な強み</h3>
+        <p>この分野の刺激を受けると、脳がぐんぐん活性化します。</p>
+        <div class="praise-box">✨ <strong>魔法のほめ言葉：</strong><br>${praiseData[top]}</div>`;
     document.getElementById('mi-res').style.display = 'block';
     checkReady();
 }
@@ -236,11 +227,11 @@ function calcKi() {
     });
     const main = Object.keys(types).reduce((a, b) => types[a] > types[b] ? a : b);
     const details = {
-        "デリケート": "🌿 <strong>【あるある】</strong> 石橋を叩いて渡る慎重派。失敗を極端に嫌がることがあります。<br>💡 <strong>【ヒント】</strong> 無理に押さず、本人が安全だと確信するまで「待つ」のが一番の近道です。",
-        "アクティブ": "🚀 <strong>【あるある】</strong> 好奇心爆発！危ないことでも飛び込んで、後でびっくりします。<br>💡 <strong>【ヒント】</strong> 叱るより「予告」と「環境整備」。エネルギーを発散できる場所を多めに用意して。",
-        "エンジェル": "🌸 <strong>【あるある】</strong> 穏やかで育てやすい。でも、自分の本音をグッと堪えていることも。<br>💡 <strong>【ヒント】</strong> 「本当はどう思ってる？」と本音を拾い上げる時間を意識的に作ってあげて。",
-        "テキスト": "📚 <strong>【あるある】</strong> 規律正しく、見通しが必要。想定外のことにパニックになることも。<br>💡 <strong>【ヒント】</strong> 予定の変更は早めに。具体的で論理的な説明が本人の安心感に直結します。",
-        "ネガティブ": "⚡ <strong>【あるある】</strong> 情熱家で激しい！自分の思い通りにならないと全力で抵抗します。<br>💡 <strong>【ヒント】</strong> 感情を一度「まるごと」受け止めて。落ち着いてから交渉を始めましょう。"
+        "デリケート": "🌿 慎重派で感受性豊かなタイプ。安心感を土台に挑戦を支えましょう。",
+        "アクティブ": "🚀 好奇心旺盛なチャレンジャー。安全を守りつつエネルギーを肯定しましょう。",
+        "エンジェル": "🌸 調和を重んじる優しいタイプ。本音を引き出す関わりを大切に。",
+        "テキスト": "📚 規律と見通しを好むタイプ。具体的なルールが安心感に繋がります。",
+        "ネガティブ": "⚡ 情熱的でこだわりが強いタイプ。感情をまるごと受け止める包容力を。"
     };
     results.ki = { type: main, detail: details[main] };
     document.getElementById('ki-res').innerHTML = `<h3>🌈 お子さんの「こころ」：${main}タイプ</h3><p>${details[main]}</p>`;
@@ -255,15 +246,8 @@ function calcKa() {
         scores[d.t] = (scores[d.t] || 0) + val;
     });
     const top = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
-    const details = {
-        "視覚支援": "🖼️ <strong>【傾向】</strong> 耳からの指示より、目からの情報が安心材料になります。<br>💡 <strong>【対応】</strong> 写真、絵カード、タイマー。目で見て「今何をするか」が分かる環境を。",
-        "聴覚配慮": "🎧 <strong>【傾向】</strong> ざわつきが頭の中で混ざってしまい、疲れやすいです。<br>💡 <strong>【対応】</strong> 静かな「避難場所」の確保。指示を出す時は一対一で、騒音を避けて伝えて。",
-        "構造化": "📦 <strong>【傾向】</strong> 整理されていない空間だと、脳が混乱して動きが止まります。<br>💡 <strong>【対応】</strong> 定位置を決め、ラベルを貼る。手順を小分けにしてリスト化しましょう。",
-        "感覚統合": "🌀 <strong>【傾向】</strong> 脳の感覚の受け取り方に個性があります。嫌な感触、好きな感触がハッキリ。<br>💡 <strong>【対応】</strong> 不快な刺激を無理強いせず、好きな刺激（揺れや圧迫）を遊びで満たして。",
-        "実行機能": "⏳ <strong>【傾向】</strong> 切り替えや記憶の保持にエネルギーが必要です。<br>💡 <strong>【対応】</strong> チェックリストや「あと5分」の予告。外付けの司令塔として伴走してあげて。"
-    };
-    results.ka = { type: top, detail: details[top] };
-    document.getElementById('ka-res').innerHTML = `<h3>🏠 お子さんの「くらし」：${top}の配慮</h3><p>${details[top]}</p>`;
+    results.ka = { type: top };
+    document.getElementById('ka-res').innerHTML = `<h3>🏠 お子さんの「くらし」：${top}の配慮</h3><p>お子さんの脳に優しい環境づくりのヒントが見つかりました。</p>`;
     document.getElementById('ka-res').style.display = 'block';
     checkReady();
 }
@@ -279,13 +263,15 @@ function checkReady() {
 function generateTotalDiagnosis() {
     const miTop = results.mi ? Object.keys(results.mi).reduce((a, b) => results.mi[a] > results.mi[b] ? a : b) : "（未回答）";
     let html = `
-        <div class="summary-box" style="border-left-color:var(--mi-color)">🤝 <strong>「強み」を活かす</strong><br>${miTop}の力を活用しましょう。得意なことで自信を貯金していく時期です。</div>
-        <div class="summary-box" style="border-left-color:var(--ki-color)">🫂 <strong>「気質」に寄り添う</strong><br>${results.ki ? results.ki.detail : '性格を尊重した声かけを。'}</div>
-        <div class="summary-box" style="border-left-color:var(--ka-color)">🏗️ <strong>「環境」を整える</strong><br>${results.ka ? results.ka.detail : '過ごしやすい場作りを。'}</div>
-        <div style="background:#fff7f7; padding:20px; border-radius:15px; border:2px dashed #ff7f7f; font-size:0.9rem; line-height:1.7;">
-            <strong>💎 総合伴走アドバイス：</strong><br>
-            お子さんの行動には必ず「理由」があります。${results.ka ? results.ka.type : '環境'}の調整で物理的なハードルを下げ、${miTop}の強みで「できた！」を増やしましょう。<br><br>
-            大切なのは、大人がお子さんの「通訳者」になること。この子の素晴らしい個性が、今の環境の中で一番良い形で発揮されるよう、一歩引いて、そして隣に座って見守っていきましょう。
+        <div class="summary-box" style="border-left-color:var(--mi-color)">🤝 <strong>「強み」を活かす：${miTop}の力</strong><br>この子の得意分野です。課題に向き合う時も、この強みを経由するとスムーズです。</div>
+        <div class="summary-box" style="border-left-color:var(--ki-color)">🫂 <strong>「気質」に寄り添う：${results.ki ? results.ki.type : '心'}への理解</strong><br>${results.ki ? results.ki.detail : 'お子さんの個性を尊重しましょう。'}</div>
+        <div class="summary-box" style="border-left-color:var(--ka-color)">🏗️ <strong>「環境」を整える：${results.ka ? results.ka.type : '生活'}の工夫</strong><br>苦手を克服するのではなく、環境を整えて「苦手をカバー」してあげましょう。</div>
+        
+        <div class="message-box">
+            <strong>お父さん・お母さんへ</strong><br>
+            毎日、本当にお疲れ様です。お子さんのことをもっと理解したい、どう支えればいいか知りたい……。そう思ってこのツールを最後まで使ってくださったこと自体が、お子さんへの何よりの愛情の証です。<br><br>
+            「親」という役割は、時に孤独で、正解が見えなくて不安になることもあります。でも、完璧な親である必要はありません。今日この結果を見て、「あ、これはこの子の個性なんだ」と一息つけたなら、それだけで十分素晴らしい一歩です。
+            お子さんと一緒に、あなた自身も大切にしてくださいね。
         </div>`;
     document.getElementById('total-content').innerHTML = html;
 }
